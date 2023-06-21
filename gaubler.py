@@ -62,18 +62,20 @@ def update_vertex(d, lattice, index):
         return
 
 
-D = 3
-N = 3
-P = 0.8
-T = 100
+if __name__ == "__main__":
 
-# logging.basicConfig(level=logging.DEBUG)
-tensor = z_d(D, N, P)
-indices = get_random_indices(D, N, T)
-interior_indices = tuple([slice(1,-1)]*D)
+    D = 3
+    N = 3
+    P = 0.8
+    T = 100
 
-for i, index in enumerate(indices):
-    update_vertex(D, tensor, index)
-    if sum(tensor[interior_indices].flatten()) == N**D:
-        print(f"p={P}, d={D}, n={N}: fixation has happened after {i} iterations")
-        break
+    # logging.basicConfig(level=logging.DEBUG)
+    tensor = z_d(D, N, P)
+    indices = get_random_indices(D, N, T)
+    interior_indices = tuple([slice(1,-1)]*D)
+
+    for i, index in enumerate(indices):
+        update_vertex(D, tensor, index)
+        if sum(tensor[interior_indices].flatten()) == N**D:
+            print(f"p={P}, d={D}, n={N}: fixation has happened after {i} iterations")
+            break
