@@ -1,5 +1,6 @@
 import numpy as np
 np.random.seed(0)
+import logging
 
 def z_d(d, n, p):
     """Returns a d-dimensional tensor of size n, vertices initialized 
@@ -26,6 +27,7 @@ def _get_neighbor_indices(d, index):
         neighbors.append(new_index_down)
         neighbors.append(new_index_up)
     
+    logging.debug(f"neighbors of {index} are {neighbors}")
     return np.array(neighbors)
 
 def get_random_indices(d, n, t):
@@ -41,33 +43,37 @@ def update_vertex(d, lattice, index):
     neighbor_indices = neighbors + 1
     
     neighbor_indices = tuple(neighbor_indices.T.reshape((D, 2*D)))
-    
     sum = np.sum(lattice[neighbor_indices])
+    logging.debug(f"neighbors of {index} are {lattice[neighbor_indices]}, sum is {sum}")
     # d is half the number of neighbors
     if sum > d:
         # again add one to index because of buffer
         lattice[tuple(index+1)] = 1
+        logging.debug(f"updated {index} to 1")
+        return
     if sum == d:
         # flip coin
         z = np.random.binomial(n=1, p=0.5)
         lattice[tuple(index+1)] = z
-    
-    return
+        logging.debug(f"updated {index} to random number {z}")
+        return
+    else:
+        logging.debug(f"did not update {index}")
+        return
 
 
 D = 3
 N = 3
-P = 0.9
-T = 50
+P = 0.8
+T = 100
 
-
+# logging.basicConfig(level=logging.DEBUG)
 tensor = z_d(D, N, P)
 indices = get_random_indices(D, N, T)
+interior_indices = tuple([slice(1,-1)]*D)
 
 for i, index in enumerate(indices):
     update_vertex(D, tensor, index)
-    if sum(tensor.flatten()) == (N+2)**D:
-        print(f"all ones, fixation has happened after %d iterations", i)
+    if sum(tensor[interior_indices].flatten()) == N**D:
+        print(f"p={P}, d={D}, n={N}: fixation has happened after {i} iterations")
         break
-
-
