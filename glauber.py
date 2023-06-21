@@ -60,22 +60,45 @@ def update_vertex(d, lattice, index):
     else:
         logging.debug(f"did not update {index}")
         return
+    
+
+def run_single_glauber(d,n,p,t):
+    """Runs a simulation of the Glauber dynamics on a d-dimensional lattice of size n
+    with probability p of initializing a vertex to 1"""
+    matrix = z_d(d,n,p)
+    indices = get_random_indices(d,n,t)
+    interior_indices = tuple([slice(1,-1)]*D)
+
+    for index in indices:
+        update_vertex(d, matrix, index)
+        if sum(matrix[interior_indices].flatten()) == N**D:
+            return True
+    
+    return False
+
+def run_simulation(d,n,p,t, iter):
+
+    fixations = 0
+    for i in range(iter):
+        fixation = run_single_glauber(d,n,p,t)
+        if fixation:
+            fixations += 1
+    
+    return fixations / iter
+
 
 
 if __name__ == "__main__":
 
     D = 3
-    N = 3
-    P = 0.8
-    T = 100
+    N = 10
+    T = 10000
+    iter = 10
 
-    # logging.basicConfig(level=logging.DEBUG)
-    tensor = z_d(D, N, P)
-    indices = get_random_indices(D, N, T)
-    interior_indices = tuple([slice(1,-1)]*D)
+    probs = np.arange(0.4, 0.6, 0.05)
 
-    for i, index in enumerate(indices):
-        update_vertex(D, tensor, index)
-        if sum(tensor[interior_indices].flatten()) == N**D:
-            print(f"p={P}, d={D}, n={N}: fixation has happened after {i} iterations")
-            break
+    fixations = {p: run_simulation(D,N,p,T, iter) for p in probs}
+
+    print("Fixation results:")
+    for key, value in fixations.items():
+        print(f"p={key:.5f}, fixation={value:.5f}")
