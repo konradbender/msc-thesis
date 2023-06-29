@@ -143,8 +143,8 @@ std::vector<int> run_single_glauber(int n_outer, int n_interior, double p, int t
 int main() {
     // Example usage
     std::cout << "Hello world from glauber.cpp!" << std::endl;
-    int n_outer = 300;
-    int n_interior = 280;
+    int n_outer = 100;
+    int n_interior = 80;
     double p = 0.8;
     int t = 1000000;
 
