@@ -32,5 +32,5 @@ def plot_fixation_rates(file):
 
 
 if __name__ == '__main__':
-    file = 'results/results-100k-0623_1048.json'
+    file = 'results/results-100k-0623_1445.json'
     plot_fixation_rates(file)

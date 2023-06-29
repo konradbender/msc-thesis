@@ -27,16 +27,16 @@ if __name__ == "__main__":
     N_INTERIOR = 280
     
     # number of time steps for each glauber dynamics iteration
-    T = int(100000)
+    T = int(300000)
 
     # number of times we run glauber dynamcis for each probability
-    ITER = 3
+    ITER = 6
 
     # tolerance for fixation
     TOL = 0.85
 
     epsilons = [0.01, 0.025, 0.05, 0.075, 0.1]
-    probs =  [0.5 - x for x in epsilons] + [0.5 + x for x in epsilons] + [0.7, 0.8, 0.9]
+    probs =  [0.5 + x for x in epsilons] + [0.7, 0.8, 0.9]
     probs.sort()
 
     results = []
