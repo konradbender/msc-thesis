@@ -145,7 +145,7 @@ int main() {
     std::cout << "Hello world from glauber.cpp!" << std::endl;
     int n_outer = 100;
     int n_interior = 80;
-    double p = 0.8;
+    double p = 0.8
     int t = 1000000;
 
     std::vector<int> result = run_single_glauber(n_outer, n_interior, p, t, false);

@@ -4,6 +4,8 @@ import concurrent.futures as fts
 import multiprocessing as mp
 import matplotlib.pyplot as plt
 import json
+import datetime
+import os
 
 def squary_boundary_fix(n, p, boundary=1):
     """Returns a 2-dimensional matrix of size n, vertices initialized 
@@ -123,6 +125,12 @@ if __name__ == "__main__":
 
     np.random.seed(0)
 
+    now = datetime.datetime.now()
+    time_string = now.strftime('%m%y_%H%M')
+
+    os.makedirs("plots", exist_ok=True)
+    os.makedirs("results", exist_ok=True)
+
     logging.basicConfig(level=logging.ERROR)
 
     # dimension of the lattice B'
@@ -131,23 +139,21 @@ if __name__ == "__main__":
     N_INTERIOR = 280
     
     # number of time steps for each glauber dynamics iteration
-    T = int(1e5)
+    T = int(10)
 
     # number of times we run glauber dynamcis for each probability
-    ITER = 10
+    ITER = 3
 
     # tolerance for fixation
     TOL = 0.8
 
     epsilons = [0.01, 0.025, 0.05, 0.075, 0.1]
-    probs = [0.3, 0.4, 0.45] + [0.5 - x for x in epsilons] + [0.5 + x for x in epsilons] + [0.55, 0.6, 0.7]
+    probs =  [0.5 - x for x in epsilons] + [0.5 + x for x in epsilons] + [0.7, 0.8, 0.9]
     probs.sort()
 
     results = []
-    fixation_rates = []
-    mean_iterations = []
 
-    with fts.ProcessPoolExecutor(max_workers=mp.cpu_count() - 1) as executor:
+    with fts.ProcessPoolExecutor(max_workers=mp.cpu_count()) as executor:
         futures = []
         for prob in probs:
             result = executor.submit(run_simulation, N_OUTER, N_INTERIOR, prob, T, ITER, TOL)
@@ -157,17 +163,16 @@ if __name__ == "__main__":
         
         for future in fts.as_completed(futures):
             results.append(future.result())
-            fixation_rates.append(future.result()['fixation_rate'])
-            mean_iterations.append(future.result()['mean_iterations'])
-            print("results are in for probabiliy: ", future.result()["p"])
+            prob = future.result()["p"]
+            print("results are in for probabiliy: ", prob)
 
-        
-    json.dump(results, open("results-100k.json", "w"))
+    results.insert(0, {"n_outer": N_OUTER, "n_inner": N_INTERIOR, "t": T, "tol": TOL, "iterations": ITER,
+                       "time_string": time_string})
+    
+    json.dump(results, open(f"results/results-100k-{time_string}.json", "w"))
 
-    fig, ax = plt.subplots()
-    plt.plot(probs, fixation_rates)
-    ax.set_title(f"Fixation Rates for t={T}, n={N_OUTER}, m={N_INTERIOR}")
-    plt.savefig("fixation_rates.png")
+
+    print("finished, took ", datetime.datetime.now() - now, " to run")
 
 
 
