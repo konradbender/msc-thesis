@@ -1,15 +1,24 @@
 #include <iostream>
+#include <fstream>
+#include <iterator>
 #include <vector>
 #include <random>
+#include <string>
 #include "glauber.h"
+#include <ctime>
+
+const int logging_step = 1000;
+
 
 extern "C" {
-    bool run_single_c(int n_outer, int n_interior, double p, int t, double thres){
-        return run_single_glauber(n_outer, n_interior, p, t, thres);}
+    bool run_single_c(const int n_outer, const int n_interior, const double p, int t, const double thres, 
+    const char run_id[], const char call_id[]){
+        return run_single_glauber(n_outer, n_interior, p, t, thres, run_id, call_id);}
 }
 
-std::vector<std::vector<int> > squary_boundary_fix(int n, double p, int boundary = 1) {
-    std::vector<std::vector<int> > matrix(n, std::vector<int>(n));
+
+std::vector<std::vector<bool> > squary_boundary_fix(int n, double p, int boundary = 1) {
+    std::vector<std::vector<bool> > matrix(n, std::vector<bool>(n));
 
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -24,22 +33,6 @@ std::vector<std::vector<int> > squary_boundary_fix(int n, double p, int boundary
     for (int i = 0; i < n; i++) {
         matrix[0][i] = boundary;
         matrix[n-1][i] = boundary;
-    }
-
-    return matrix;
-}
-
-std::vector<std::vector<int> > squary_boundary_random(int n, double p, int boundary = 1) {
-    std::vector<std::vector<int> > matrix(n, std::vector<int>(n));
-
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::bernoulli_distribution dis(p);
-
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < n; j++) {
-            matrix[i][j] = dis(gen);
-        }
     }
 
     return matrix;
@@ -62,44 +55,35 @@ std::vector<std::vector<int> > get_random_indices(int n, int t) {
     return indices;
 }
 
-void update_vertex(std::vector<std::vector<int> > &lattice, std::vector<int>  index) {
-    int deltas[4][2] = {
-        {0, 1},
-        {1, 0},
-        {-1, 0},
-        {0,- 1}
-    };
 
-    int sum = 0;
+bool run_single_glauber(const int n_outer, const int n_interior, const double p, const int t, 
+    const double thres, const char run_id[], const char call_id[]) {
+    
+    clock_t start = clock();
+    
+    std::vector<std::vector<bool> > matrix = squary_boundary_fix(n_outer, p);
 
-    // this iterates through neighbor_indices and creates the variable
-    // neighbor, for each iteration
-    for (const auto& delta : deltas) {
-        sum += lattice[index[0] + delta[0]][index[1] + delta[1]];
-    }
+    std::cout << "Aftter matrix: " << static_cast<double>(clock() - start) / CLOCKS_PER_SEC << std::endl;
 
-    if (sum > 2) {
-        lattice[index[0]][index[1]] = 1;
-    }
-    else if (sum < 2) {
-        lattice[index[0]][index[1]] = 0;
-    }
-    else if (sum == 2) {
-        std::random_device rd;
-        std::mt19937 gen(rd());
-        std::bernoulli_distribution dis(0.5);
-        lattice[index[0]][index[1]] = dis(gen);
-    }
-}
+    // the indices to iterate over
+    std::vector<std::vector<int> > indices = get_random_indices(n_outer, t); 
 
-bool run_single_glauber(int n_outer, int n_interior, double p, int t, double thres) {
+    std::cout << "After indices:" << static_cast<double>(clock() - start) / CLOCKS_PER_SEC << std::endl;
 
+    std::vector<double> trace = std::vector<double>(t);
+    fill(trace.begin(), trace.end(), -1.0); // initialize to -1 to see where iteration stopped
 
-    std::vector<std::vector<int> > matrix = squary_boundary_fix(n_outer, p);
-    std::vector<std::vector<int> > indices = get_random_indices(n_outer, t);
-
-    int buffer = (n_outer - n_interior) / 2;
     std::vector<std::vector<int> > interior_indices(n_interior*n_interior, std::vector<int>(2));
+
+    double target = interior_indices.size();
+    int buffer = (n_outer - n_interior) / 2;
+
+
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::bernoulli_distribution dis(0.5);
+
+    
     int index = 0;
     for (int i = 0; i < n_interior; i++) {
         for (int j = 0; j < n_interior; j++) {
@@ -109,32 +93,68 @@ bool run_single_glauber(int n_outer, int n_interior, double p, int t, double thr
         }
     }
 
+    std::cout << "After interior indices: " << static_cast<double>(clock() - start) / CLOCKS_PER_SEC << std::endl;
+
     int iterations = 0;
     bool fixation = false;
+
     for (const auto& index : indices) {
-        iterations++;
-        update_vertex(matrix, index);
-        
-        double target = interior_indices.size();
+        // begin update vertex
+
+        int nb_sum = matrix[index[0] + 0][index[1] + 1] + 
+            matrix[index[0] + 1][index[1] + 0] + 
+            matrix[index[0] - 1][index[1] + 0] + 
+            matrix[index[0] + 0][index[1] - 1];
+
+        if (nb_sum > 2) {
+            matrix[index[0]][index[1]] = 1;
+        }
+        else if (nb_sum < 2) {
+            matrix[index[0]][index[1]] = 0;
+        }
+        else if (nb_sum == 2) {
+            matrix[index[0]][index[1]] = dis(gen);
+        }
+
+        // end update vertex
+                
         double sum = 0;
 
         for (const auto& interior : interior_indices) {
             sum += matrix[interior[0]][interior[1]];
         }
+        
+        double share = sum / target;
+        trace[iterations] = share;
 
-        if (sum >= thres*target || sum <= (1-thres)*target) {
+        if (sum >= thres*target) {
             fixation = true;
             break;
         }
-        double share = sum / target;
+        else if (sum <= (1-thres)*target) {
+            fixation = false;
+            break;
+        }
         
-        if (iterations % 10000 == 0) {
-            std::cout << "iteration: " << std::to_string(iterations) << " for probability " << std::to_string(p); 
+        iterations++;
+        
+        if (iterations % logging_step == 0) {
+            std::cout << static_cast<double>(clock() - start) / CLOCKS_PER_SEC  << std::to_string(iterations) << " for probability " << std::to_string(p); 
             std::cout << " current share of 1: " << std::to_string(share) << std::endl;
         }
+
+        
     }
     
-    std::cout << "finished a single run of glauber dynamics with result: " <<  std::to_string(fixation) << std::endl;
+    std::cout << "finished a single run of glauber dynamics with result: " <<  std::to_string(fixation) 
+        << " after " << std::to_string(iterations) << " iterations." << std::endl;
+
+    // save vector to file
+    std::string filename = "temp/" + std::string(run_id) + "_" + std::string(call_id) + ".txt";
+    std::ofstream output_file(filename);
+    std::ostream_iterator<double> output_iterator(output_file, "\n");
+    std::copy(trace.begin(), trace.end(), output_iterator);
+    output_file.close();
 
     return fixation;
 }
