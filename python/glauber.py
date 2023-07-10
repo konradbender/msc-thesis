@@ -62,15 +62,18 @@ def update_vertex(d, lattice, index):
         return
     
 
-def run_single_glauber(d,n,p,t):
+def run_single_glauber(d,n,p,t, vector_path = None):
     """Runs a simulation of the Glauber dynamics on a d-dimensional lattice of size n
     with probability p of initializing a vertex to 1"""
     matrix = z_d(d,n,p)
     indices = get_random_indices(d,n,t)
     interior_indices = tuple([slice(1,-1)]*D)
+    if vector_path:
+        vector = np.ndarray(shape=t)
 
-    for index in indices:
+    for i, index in enumerate(indices):
         update_vertex(d, matrix, index)
+        summed_array = matri
         if sum(matrix[interior_indices].flatten()) == N**D:
             return True
     
