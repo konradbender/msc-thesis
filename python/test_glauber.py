@@ -1,4 +1,4 @@
-import glauber2D
+import glauber2DBitset as glauber2D
 import numpy as np
 import logging
 import timeit
@@ -7,7 +7,7 @@ from numba import njit
 
 def test_single_normal():
     np.random.seed(0)
-    result = glauber2D.run_single_glauber.py_func(np.int64(100), 
+    result = glauber2D.run_single_glauber(np.int64(100), 
                                                   np.int64(85), 
                                                   np.float64(0.7), 
                                                   np.int64(200), 
@@ -28,7 +28,7 @@ def test_single_2():
 
 def test_simulation():
     np.random.seed(0)
-    result = glauber2D.run_fixation_simulation(1000, 980, 0.7, 20000, 5, 0.8, True)
+    result = glauber2D.run_fixation_simulation(1000, 980, 0.7, 200000, 5, 0.8, False)
     print(result)
     assert(result["fixation_rate"] == 1.0)
 

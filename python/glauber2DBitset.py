@@ -3,14 +3,52 @@ import logging
 import json
 import datetime
 import os
-from numba import jit, njit, prange
-from numba.typed import Dict
-from numba.core import types
+
+from bitarray import bitarray as ba
+import bitarray
+
 
 LOGGING_STEP = 1000
 BOUNDARY = 1
 
-@jit(cache = True, parallel = False, nopython=True)
+class BitArrayMat():
+
+    def __init__(self, nrow, ncol, list) -> None:
+        self.nrow = nrow
+        self.ncol = ncol
+        self.size = nrow*ncol
+        assert(nrow*ncol == len(list))
+        self.arr = ba(list)
+
+    def idx(self, r, c):
+        assert 0 <= r < self.nrow
+        assert 0 <= c < self.ncol
+        return r * self.ncol + c
+
+
+    def __getitem__(self, key):
+        if type(key) == bitarray.bitarray:
+            return self.arr[key]
+        else:
+            x, y = key
+            flat_idx = self.idx(x,y)
+            return self.arr[flat_idx]
+        
+        
+    def __setitem__(self, key, value):
+        if type(key) == bitarray.bitarray:
+            raise NotImplementedError
+        else:
+            x, y = key
+            flat_idx = self.idx(x,y)
+            self.arr[flat_idx] = value
+        
+    def count(self, i):
+        assert (i==0 or i==1)
+        return self.arr.count(i)
+       
+
+
 def run_single_glauber(
     n_outer: np.int64, n_interior: np.int64, p: np.float64, t: np.int64, tol: np.float64, run_id: int = None,
     verbose: bool = False
@@ -35,20 +73,27 @@ def run_single_glauber(
     verbose : bool
         if print statements should be performed
     """
-
-    t = int(t)
+    
 
     matrix = np.random.binomial(n=1, p=p, size=n_outer**2).astype(np.bool_)
     matrix = matrix.reshape((n_outer, n_outer))
     matrix[0, :] = BOUNDARY
     matrix[-1, :] = BOUNDARY
 
+    matrix = BitArrayMat(n_outer, n_outer, matrix.flatten().tolist())
+
+    # list of indices we want to look at
     indices = np.random.randint(1, n_outer - 1, size=2 * t).reshape((t, 2))
 
-    buffer = (n_outer - n_interior) // np.int64(2)
-    interior_indices = (slice(buffer, -buffer), slice(buffer, -buffer))
+    # this is the padding between inner and outer lattice
+    buffer = (n_outer - n_interior) // 2
 
-    target = matrix[interior_indices].shape[0] * matrix[interior_indices].shape[1]
+    # make a bitarray for the mask for the inner lattice
+    interior_mask = np.zeros((n_outer, n_outer), dtype=np.bool_)
+    interior_mask[buffer:-buffer, buffer:-buffer] = True
+    interior_mask =  ba(interior_mask.flatten().tolist())
+
+    target = n_interior**2
 
     vector = np.ones(t) * np.int64(-1)
 
@@ -81,7 +126,7 @@ def run_single_glauber(
             z = np.random.binomial(n=1, p=np.float64(0.5))
             matrix[index[0], index[1]] = z
 
-        summed_array = np.sum(matrix[interior_indices].flatten())
+        summed_array = matrix.count(1)
 
         vector[i] = summed_array / target
 
@@ -97,17 +142,14 @@ def run_single_glauber(
 
     # end glauber for loop
     
-    result = Dict.empty(
-        key_type=types.unicode_type,
-        value_type=types.float64[:]
-    )
+    result =  {}
+
     result.update({"fixation": np.asarray([np.float64(fixation)]),
                     "iterations": np.asarray([np.float64(iterations)]), 
                     "vector": vector})
 
     return result
 
-@jit(cache = True, parallel = True, nopython=True)
 def run_fixation_simulation(
     n_outer: int, n_inner: int, p: float, t: int, iter: int, tol: float,
     verbose: bool = False
@@ -116,7 +158,7 @@ def run_fixation_simulation(
     iterations = 0
     results = []
 
-    for i in prange(iter):
+    for i in range(iter):
         result = run_single_glauber(n_outer, n_inner, p, t, tol, verbose=verbose)
         results.append(result)
         fixations += result["fixation"]

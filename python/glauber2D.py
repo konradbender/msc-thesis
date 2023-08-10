@@ -3,14 +3,11 @@ import logging
 import json
 import datetime
 import os
-from numba import jit, njit, prange
-from numba.typed import Dict
-from numba.core import types
 
 LOGGING_STEP = 1000
 BOUNDARY = 1
 
-@jit(cache = True, parallel = False, nopython=True)
+
 def run_single_glauber(
     n_outer: np.int64, n_interior: np.int64, p: np.float64, t: np.int64, tol: np.float64, run_id: int = None,
     verbose: bool = False
@@ -97,17 +94,15 @@ def run_single_glauber(
 
     # end glauber for loop
     
-    result = Dict.empty(
-        key_type=types.unicode_type,
-        value_type=types.float64[:]
-    )
+    result = {}
+
     result.update({"fixation": np.asarray([np.float64(fixation)]),
                     "iterations": np.asarray([np.float64(iterations)]), 
                     "vector": vector})
 
     return result
 
-@jit(cache = True, parallel = True, nopython=True)
+
 def run_fixation_simulation(
     n_outer: int, n_inner: int, p: float, t: int, iter: int, tol: float,
     verbose: bool = False
@@ -116,7 +111,7 @@ def run_fixation_simulation(
     iterations = 0
     results = []
 
-    for i in prange(iter):
+    for i in range(iter):
         result = run_single_glauber(n_outer, n_inner, p, t, tol, verbose=verbose)
         results.append(result)
         fixations += result["fixation"]
