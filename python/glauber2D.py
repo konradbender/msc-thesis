@@ -1,8 +1,5 @@
 import numpy as np
 import logging
-import concurrent.futures as fts
-import multiprocessing as mp
-import matplotlib.pyplot as plt
 import json
 import datetime
 import os
@@ -13,13 +10,31 @@ from numba.core import types
 LOGGING_STEP = 1000
 BOUNDARY = 1
 
-@njit(cache = True, parallel = False)
+@jit(cache = True, parallel = False, nopython=True)
 def run_single_glauber(
     n_outer: np.int64, n_interior: np.int64, p: np.float64, t: np.int64, tol: np.float64, run_id: int = None,
     verbose: bool = False
 ) -> dict:
     """Runs a simulation of the Glauber dynamics on a d-dimensional lattice of size n
-    with probability p of initializing a vertex to 1"""
+    with probability p of initializing a vertex to 1
+    
+    Parameters
+    ----------
+    n_outer : int
+        dimension of outer lattice
+    n_inner : int
+        dimension of inner lattice
+    p : float
+        probability that vertices are -1 at t=0
+    t : int
+        number of vertex-updates to perform
+    tol : float
+        minimum share of -1 vertices to reach to declare fixation
+    run_id : string
+        identification of this glauber run to retrieve files saved to disk
+    verbose : bool
+        if print statements should be performed
+    """
 
     t = int(t)
 
@@ -39,6 +54,7 @@ def run_single_glauber(
 
     iterations = 0
     fixation = np.bool_(False)
+
     for i, index in enumerate(indices):
         iterations += 1
         """Updates the vertex at index in the matrix"""
@@ -78,6 +94,8 @@ def run_single_glauber(
 
         if (iterations % LOGGING_STEP == 0) and verbose:
             print("iteration:", iterations, "share of 1 is:", (summed_array / target))
+
+    # end glauber for loop
     
     result = Dict.empty(
         key_type=types.unicode_type,
@@ -89,7 +107,7 @@ def run_single_glauber(
 
     return result
 
-@njit(cache = True, parallel = False)
+@jit(cache = True, parallel = True, nopython=True)
 def run_fixation_simulation(
     n_outer: int, n_inner: int, p: float, t: int, iter: int, tol: float,
     verbose: bool = False

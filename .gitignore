@@ -5,3 +5,6 @@ __pycache__/
 *.dSYM/
 .pytest_cache/
 .DS_Store
+temp/
+*.o
+*.so

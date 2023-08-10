@@ -11,7 +11,7 @@ import glauberFast
 from copy import deepcopy
 from numba import njit, prange
 
-@njit(cache = True, parallel = False)
+@njit(cache = True, parallel = False, debug=True)
 def run_traces(n_outer, n_interior, t, tol, iterations, p):
     n_outer = np.int64(n_outer)
     n_interior = np.int64(n_interior)
@@ -45,7 +45,7 @@ if __name__ == "__main__":
 
     os.makedirs("./trace-results", exist_ok=True)
 
-    logging.basicConfig(level=logging.ERROR)
+    logging.basicConfig(level=logging.DEBUG)
 
     # dimension of the lattice B'
     N_OUTER = 1000
@@ -54,7 +54,7 @@ if __name__ == "__main__":
 
     # number of time steps for each glauber dynamics iteration
     # T = int(20_000_000)
-    T = 1_000_000
+    T = 1_000
 
     # number of times we run glauber dynamcis for each probability
     ITERATIONS = 4
