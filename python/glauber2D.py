@@ -60,23 +60,23 @@ def run_single_glauber(
         """Updates the vertex at index in the matrix"""
 
         nb_sum = (
-            np.int64(matrix[index[0] + 1, index[1]])
-            + np.int64(matrix[index[0], index[1] + 1])
-            + np.int64(matrix[index[0] - 1, index[1]])
-            + np.int64(matrix[index[0], index[1] - 1])
+            matrix[index[0] + 1, index[1]] +
+            matrix[index[0], index[1] + 1] +
+            matrix[index[0] - 1, index[1]] +
+            matrix[index[0], index[1] - 1] 
         )
 
         # d is half the number of neighbors
-        if nb_sum > np.int64(2):
+        if nb_sum > 2:
             # again add one to index because of buffer
             matrix[index[0], index[1]] = 1
 
         # d is half the number of neighbors
-        if nb_sum < np.int64(2):
+        if nb_sum < 2:
             # again add one to index because of buffer
             matrix[index[0], index[1]] = 0
 
-        if nb_sum == np.int64(2):
+        if nb_sum == 2:
             # flip coin
             z = np.random.binomial(n=1, p=np.float64(0.5))
             matrix[index[0], index[1]] = z
