@@ -4,6 +4,8 @@ import json
 import datetime
 import os
 from ListDict import ListDict
+from BitArrayMat import BitArrayMat
+
 
 from bitarray import bitarray as ba
 import bitarray
@@ -13,44 +15,6 @@ import bitarray
 
 LOGGING_STEP = 1000
 BOUNDARY = 1
-
-
-class BitArrayMat:
-    """Wrapper for Bitarray to allow 2D indexing"""
-
-    def __init__(self, nrow, ncol, list) -> None:
-        self.nrow = nrow
-        self.ncol = ncol
-        self.size = nrow * ncol
-        assert nrow * ncol == len(list)
-        self.arr = ba(list)
-
-    def idx(self, r, c):
-        assert 0 <= r < self.nrow
-        assert 0 <= c < self.ncol
-        return r * self.ncol + c
-
-    def __getitem__(self, key):
-        if type(key) == bitarray.bitarray:
-            return self.arr[key]
-        else:
-            x, y = key
-            flat_idx = self.idx(x, y)
-            # TODO make try-catch and if index out of bouds,
-            # return a 1 if index one beyond
-            return self.arr[flat_idx]
-
-    def __setitem__(self, key, value):
-        if type(key) == bitarray.bitarray:
-            raise NotImplementedError
-        else:
-            x, y = key
-            flat_idx = self.idx(x, y)
-            self.arr[flat_idx] = value
-
-    def count(self, i):
-        assert i == 0 or i == 1
-        return self.arr.count(i)
 
 
 class GlauberSimulator:
@@ -107,6 +71,7 @@ class GlauberSimulator:
                     result.add((i, j))
 
         return result
+    
     
     def add_neighbors(self, index, list):
         """adds neighbors to the list if they are dynamic"""

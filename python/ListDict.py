@@ -1,5 +1,6 @@
 import random
 
+
 class ListDict(object):
     def __init__(self):
         self.item_to_position = {}
@@ -22,6 +23,7 @@ class ListDict(object):
             self.items[position] = last_item
             self.item_to_position[last_item] = position
 
+    
     def choose_random_item(self):
         return random.choice(self.items)    
 
