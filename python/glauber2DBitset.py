@@ -9,6 +9,7 @@ from bitarray import bitarray as ba
 import bitarray
 
 # TODO make torus
+# TODO have the matrix of present vertices in the ListDict -> can be a bitarray
 
 LOGGING_STEP = 1000
 BOUNDARY = 1
@@ -35,6 +36,8 @@ class BitArrayMat:
         else:
             x, y = key
             flat_idx = self.idx(x, y)
+            # TODO make try-catch and if index out of bouds,
+            # return a 1 if index one beyond
             return self.arr[flat_idx]
 
     def __setitem__(self, key, value):
@@ -244,8 +247,8 @@ class GlauberSimulator:
         return {
             "fixation_rate": fixations / iter,
             "mean_iterations_when_fix": mean_iterations,
-            "p": p,
+            "p": self.p,
             "n_outer": self.n_outer,
             "n_inner": self.self.n_interior,
-            "t": t,
+            "t": self.t,
         }

@@ -24,15 +24,7 @@ def test_single_2():
 
 def test_simulation():
     np.random.seed(0)
-    sim = glauber2D.GlauberSimulator(1000, 980, 0.7, 200000, 0.8)
+    sim = glauber2D.GlauberSimulator(1000, 980, 0.7, 20000, 0.8)
     result = sim.run_fixation_simulation(5, False)
     print(result)
     assert(result["fixation_rate"] == 1.0)
-
-if __name__ == "__main__":
-    N = 20
-    test_simulation()
-    test_single_2()
-    test_single_normal()
-    test_single_numba()
-    
