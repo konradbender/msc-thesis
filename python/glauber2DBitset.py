@@ -214,6 +214,6 @@ class GlauberSimulator:
             "mean_iterations_when_fix": mean_iterations,
             "p": self.p,
             "n_outer": self.n_outer,
-            "n_inner": self.self.n_interior,
+            "n_inner": self.n_interior,
             "t": self.t,
         }
