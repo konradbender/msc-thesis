@@ -4,7 +4,7 @@ from bitarray import bitarray as ba
 import numpy as np
 
 
-class ListDict(object):
+class IndexList(object):
     def __init__(self, n_row, n_col):
         self.included = BitArrayMat(n_row, n_col)
         self.included.arr.setall(False)
