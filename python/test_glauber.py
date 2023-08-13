@@ -271,8 +271,8 @@ if __name__ == "__main__":
             [
                 "-c",
                 "/Users/konrad/code/school/msc-thesis/python/pyproject.toml",
-                "-k test_large_long",
-                "--durations=1"
+                "-k test_small_1",
+                "--durations=0"
             ]
         )
     )
