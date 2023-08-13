@@ -54,6 +54,29 @@ class GlauberSim(ABC):
     def run_single_glauber( *args, **kwargs) -> dict:
         pass
 
-    @abstractmethod
-    def run_fixation_simulation(*args, **kwargs) -> dict:
-        pass
+    # This is not tested yet
+    def run_fixation_simulation(
+        self,
+        iter,
+        verbose: bool = False
+    ) -> dict:
+        fixations = 0
+        iterations = 0
+        results = []
+
+        for i in range(iter):
+            result = self.run_single_glauber(verbose=verbose)
+            results.append(result)
+            fixations += result["fixation"]
+            if result["fixation"]:
+                iterations += result["iterations"]
+
+        mean_iterations = iterations / fixations if fixations > 0 else 0
+        return {
+            "fixation_rate": fixations / iter,
+            "mean_iterations_when_fix": mean_iterations,
+            "p": self.p,
+            "n_outer": self.n_outer,
+            "n_inner": self.n_interior,
+            "t": self.t,
+        }
