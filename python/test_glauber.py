@@ -229,13 +229,22 @@ class TestSingleGlauber:
         result = sim.run_single_glauber(False)
         assert(result["fixation"] == False and result["iterations"] == 2000)
 
-
-    def test_large(self, class_to_test: type[GlauberSim]):
+    @pytest.mark.slow
+    def test_large_long(self, class_to_test: type[GlauberSim]):
         np.random.seed(0)
-        sim = class_to_test(n_interior=2000, padding=100, p=0.98, t=200000, tol=0.99)
-        result = sim.run_single_glauber(False)
-        assert(result["fixation"] == False and result["iterations"] == 2000)
+        sim = class_to_test(n_interior=1000, padding=100, p=0.98, t=200000, tol=0.982)
+        result = sim.run_single_glauber(verbose=True)
 
+        assert result["fixation"] == True
+        assert pytest.approx(result["iterations"], 200) == 162854
+
+    @pytest.mark.slow
+    def test_small_long(self, class_to_test: type[GlauberSim]):
+        np.random.seed(0)
+        sim = class_to_test(n_interior=200, padding=15, p=0.7, t=200000, tol=0.9)
+        result = sim.run_single_glauber(verbose=True)
+        assert result["fixation"] == True
+        assert pytest.approx(result["iterations"], 200) == 196555
 
 
     def test_single_2(self, class_to_test):
@@ -262,7 +271,8 @@ if __name__ == "__main__":
             [
                 "-c",
                 "/Users/konrad/code/school/msc-thesis/python/pyproject.toml",
-                "-k test_large",
+                "-k test_large_long",
+                "--durations=1"
             ]
         )
     )
