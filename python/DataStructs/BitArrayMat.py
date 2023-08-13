@@ -24,6 +24,7 @@ class BitArrayMat:
         return self.arr[slice]
 
     def __getitem__(self, key):
+        # x , y is row, col
         x, y = key
         flat_idx = self.idx(x, y)
         # TODO make try-catch and if index out of bouds,
@@ -31,6 +32,7 @@ class BitArrayMat:
         return self.arr[flat_idx]
 
     def __setitem__(self, key, value):
+        # x, y is row, col
         x, y = key
         flat_idx = self.idx(x, y)
         self.arr[flat_idx] = value
@@ -47,4 +49,23 @@ class BitArrayMat:
             result += "\n"
 
         return result
+    
+    def debug_print(self, index):
+        # x, y is row, col
+        x, y = index
+        result = ""
+
+        for row in range(self.nrow):
+            row_str = self.arr[row*self.ncol:(row+1)*self.ncol].to01()
+            if row == x:
+                result += row_str[:y] + "*" + row_str[y+1:]
+            else:
+                result += row_str
+            result += "\n"
+
+        return result
+    
+    @property
+    def shape(self):
+        return (self.nrow, self.ncol)
     
