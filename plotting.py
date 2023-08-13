@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import os
 import numpy as np
+from python.DataStructs.BitArrayMat import BitArrayMat
 
 
 def plot_fixation_rates(file):
@@ -55,7 +56,17 @@ def plot_trace(file):
     plt.savefig(f"plots/trace-{time_string}.png")
     plt.show()
 
+def plot_bitmap(dir, iter):
+    with (open(f"{dir}/params.json")) as f:
+        params = json.load(f)
+
+
+    matrix = BitArrayMat(params['n_outer'], params['n_outer'])
+    matrix.load_from_file(dir + f"/iter-{iter}.bmp")
+    np_mat = matrix.to_numpy()
+    plt.imshow(np_mat)
+    plt.show()
 
 if __name__ == '__main__':
-    file = 'trace-results/results-1M-0707_1340.json'
-    plot_trace(file)
+    file = '/Users/konrad/code/school/msc-thesis/bitmap_results/0813_16-00-07'
+    plot_bitmap(file, 1500)

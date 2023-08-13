@@ -1,5 +1,6 @@
 import bitarray 
 from bitarray import bitarray as ba
+import numpy as np
 
 class BitArrayMat:
     """Wrapper for Bitarray to allow 2D indexing"""
@@ -69,3 +70,19 @@ class BitArrayMat:
     def shape(self):
         return (self.nrow, self.ncol)
     
+    def export_to_file(self, path):
+        with open(path, "wb") as f:
+            self.arr.tofile(f)
+
+    def load_from_file(self, path):
+        self.arr = ba()
+        with open(path, "rb") as f:
+            self.arr.fromfile(f)
+
+    def to_numpy(self):
+        try:
+            bits = np.array(self.arr.tolist())
+        except MemoryError as e:
+            print(e)
+        non_pad = bits[:self.ncol * self.nrow]
+        return non_pad.reshape((self.nrow, self.ncol))

@@ -10,7 +10,8 @@ class GlauberSim(ABC):
         t: np.int64,
         tol: np.float64,
         padding : np.int64 = None, # for new code
-        n_outer: np.int64 = None # kept for depreceated compatibility
+        n_outer: np.int64 = None,  # kept for depreceated compatibility
+        save_bitmaps_every = None
     ) -> None:
         """Runs a simulation of the Glauber dynamics on a d-dimensional lattice of size n
         with probability p of initializing a vertex to 1
@@ -45,6 +46,7 @@ class GlauberSim(ABC):
         self.p = p
         self.t = t
         self.tol = tol
+        self.save_bitmaps_every = save_bitmaps_every
 
         
 

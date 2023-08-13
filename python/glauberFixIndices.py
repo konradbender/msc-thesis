@@ -23,12 +23,28 @@ class GlauberSimulatorFixIndices(GlauberSim):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         logging.info(f"Initializing GlauberSimulatorFixIndices with parameters: {kwargs}")
+        if self.save_bitmaps_every is not None:
+            now = datetime.datetime.now()
+            time_string = now.strftime('%m%d_%H-%M-%S')
+            self.bitmap_dir = f"bitmap_results/{time_string}"
+            os.makedirs(self.bitmap_dir, exist_ok=True)
 
+            with open(f"{self.bitmap_dir}/params.json", "w") as f:
+                params = kwargs.copy()
+                params.update({"time_string": time_string})
+                params.update({"n_outer": self.n_outer})
+                json.dump(params, f)
+
+
+    def save_bitmap(self, matrix: BitArrayMat, iter: int) -> None:
+        logging.debug(f"saving bitmap for iteration {iter}")
+        matrix.export_to_file(self.bitmap_dir + f"/iter-{iter}.bmp")
+        
 
     def run_single_glauber(
         self,
-        run_id: int = None,
         verbose: bool = False,
+        *args, **kwargs
     ) -> dict:
         """Runs a simulation of the Glauber dynamics on a d-dimensional lattice of size n
         with probability p of initializing a vertex to 1
@@ -45,8 +61,6 @@ class GlauberSimulatorFixIndices(GlauberSim):
             number of vertex-updates to perform
         tol : float
             minimum share of -1 vertices to reach to declare fixation
-        run_id : string
-            identification of this glauber run to retrieve files saved to disk
         verbose : bool
             if print statements should be performed
         """
@@ -93,8 +107,7 @@ class GlauberSimulatorFixIndices(GlauberSim):
 
         # the index is (row, column)
         for i, index in enumerate(indices):
-            """Updates the vertex at index in the matrix"""
-                
+            """Updates the vertex at index in the matrix"""                
 
             nb_sum = (
                 matrix[index[0] + 1, index[1]] +
@@ -153,6 +166,9 @@ class GlauberSimulatorFixIndices(GlauberSim):
             if (i % LOGGING_STEP == 0) and verbose:
                 logging.info(f"iteration: {i} share of 1 is: {summed_array / target}")
 
+            if self.save_bitmaps_every is not None and (i % self.save_bitmaps_every == 0):
+                self.save_bitmap(matrix, i)
+
         # end glauber for loop
 
         if not fixation:
@@ -164,6 +180,7 @@ class GlauberSimulatorFixIndices(GlauberSim):
                         "iterations":iterations, 
                         "vector": vector})
         logging.info(f"Result: {result}")
+
 
         return result
 
