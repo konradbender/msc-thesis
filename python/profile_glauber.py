@@ -2,7 +2,7 @@ import cProfile
 import numpy as np
 
 
-import glauber2DBitset as glauber2D
+import glauberFixIndices as glauber2D
 
 
 def test_simulation():

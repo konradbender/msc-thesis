@@ -1,5 +1,5 @@
 import random
-from BitArrayMat import BitArrayMat
+from .BitArrayMat import BitArrayMat
 from bitarray import bitarray as ba
 import numpy as np
 

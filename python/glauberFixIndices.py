@@ -7,78 +7,16 @@ import os
 from bitarray import bitarray as ba
 import bitarray
 
+from DataStructs.BitArrayMat import BitArrayMat
+
+from glauberSim import GlauberSim
+
 
 LOGGING_STEP = 1000
 BOUNDARY = 1
 
-class BitArrayMat():
 
-    def __init__(self, nrow, ncol, list) -> None:
-        self.nrow = nrow
-        self.ncol = ncol
-        self.size = nrow*ncol
-        assert(nrow*ncol == len(list))
-        self.arr = ba(list)
-
-    def idx(self, r, c):
-        assert 0 <= r < self.nrow
-        assert 0 <= c < self.ncol
-        return r * self.ncol + c
-
-
-    def __getitem__(self, key):
-        if type(key) == bitarray.bitarray:
-            return self.arr[key]
-        else:
-            x, y = key
-            flat_idx = self.idx(x,y)
-            return self.arr[flat_idx]
-        
-        
-    def __setitem__(self, key, value):
-        if type(key) == bitarray.bitarray:
-            raise NotImplementedError
-        else:
-            x, y = key
-            flat_idx = self.idx(x,y)
-            self.arr[flat_idx] = value
-        
-    def count(self, i):
-        assert (i==0 or i==1)
-        return self.arr.count(i)
-       
-
-class GlauberSimulatorFixIndices:
-
-    def __init__(
-        self,
-        n_outer: np.int64,
-        n_interior: np.int64,
-        p: np.float64,
-        t: np.int64,
-        tol: np.float64,
-    ) -> None:
-        """Runs a simulation of the Glauber dynamics on a d-dimensional lattice of size n
-        with probability p of initializing a vertex to 1
-
-        Parameters
-        ----------
-        n_outer : int
-            dimension of outer lattice
-        n_inner : int
-            dimension of inner lattice
-        p : float
-            probability that vertices are -1 at t=0
-        t : int
-            number of vertex-updates to perform
-        tol : float
-            minimum share of -1 vertices to reach to declare fixation
-        """
-        self.n_outer = n_outer
-        self.n_interior = n_interior
-        self.p = p
-        self.t = t
-        self.tol = tol
+class GlauberSimulatorFixIndices(GlauberSim):
 
 
     def run_single_glauber(
@@ -116,7 +54,7 @@ class GlauberSimulatorFixIndices:
         matrix = BitArrayMat(self.n_outer, self.n_outer, matrix.flatten().tolist())
 
         # list of indices we want to look at
-        indices = np.random.randint(1, self.n_outer - 1, size=2 * self.t).reshape((t, 2))
+        indices = np.random.randint(1, self.n_outer - 1, size=2 * self.t).reshape((self.t, 2))
 
         # this is the padding between inner and outer lattice
         buffer = (self.n_outer - self.n_interior) // 2
@@ -185,6 +123,7 @@ class GlauberSimulatorFixIndices:
 
     def run_fixation_simulation(
         self,
+        iter,
         verbose: bool = False
     ) -> dict:
         fixations = 0
