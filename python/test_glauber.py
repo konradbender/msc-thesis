@@ -274,7 +274,7 @@ if __name__ == "__main__":
             [
                 "-c",
                 "/Users/konrad/code/school/msc-thesis/python/pyproject.toml",
-                "-k test_small_bitmap",
+                "-k not slow and not simulation",
                 "--durations=0"
             ]
         )

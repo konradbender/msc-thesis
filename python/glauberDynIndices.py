@@ -49,10 +49,10 @@ class GlauberSimDynIndices(GlauberSim):
         """adds neighbors to the list if they are dynamic"""
 
         neighbors = (
-                            (index[0] + 1, index[1]),
-                            (index[0], index[1] + 1),
-                            (index[0] - 1, index[1]),
-                            (index[0], index[1] - 1),
+                        (index[0] + 1, index[1]),
+                        (index[0], index[1] + 1),
+                        (index[0] - 1, index[1]),
+                        (index[0], index[1] - 1),
                         )
         
         for neighbor in neighbors:

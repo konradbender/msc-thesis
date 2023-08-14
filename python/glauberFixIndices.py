@@ -12,7 +12,7 @@ from DataStructs.BitArrayMat import BitArrayMat
 from glauberSim import GlauberSim
 
 
-LOGGING_STEP = 1000
+LOGGING_STEP = 10000
 BOUNDARY = 1
 DEBUG = False
 
@@ -21,19 +21,18 @@ DEBUG = False
 class GlauberSimulatorFixIndices(GlauberSim):
 
     def __init__(self, *args, **kwargs) -> None:
+
         super().__init__(*args, **kwargs)
         logging.info(f"Initializing GlauberSimulatorFixIndices with parameters: {kwargs}")
-        if self.save_bitmaps_every is not None:
-            now = datetime.datetime.now()
-            time_string = now.strftime('%m%d_%H-%M-%S')
-            self.bitmap_dir = f"bitmap_results/{time_string}"
-            os.makedirs(self.bitmap_dir, exist_ok=True)
+        
+        self.bitmap_dir = f"{self.results_dir}/bitmap_results/"
+            
+        os.makedirs(self.bitmap_dir, exist_ok=True)
 
-            with open(f"{self.bitmap_dir}/params.json", "w") as f:
-                params = kwargs.copy()
-                params.update({"time_string": time_string})
-                params.update({"n_outer": self.n_outer})
-                json.dump(params, f)
+        with open(f"{self.bitmap_dir}/params.json", "w") as f:
+            params = kwargs.copy()
+            params.update({"n_outer": self.n_outer})
+            json.dump(params, f)
 
 
     def save_bitmap(self, matrix: BitArrayMat, iter: int) -> None:
@@ -51,16 +50,6 @@ class GlauberSimulatorFixIndices(GlauberSim):
         
         Parameters
         ----------
-        n_outer : int
-            dimension of outer lattice
-        n_inner : int
-            dimension of inner lattice
-        p : float
-            probability that vertices are -1 at t=0
-        t : int
-            number of vertex-updates to perform
-        tol : float
-            minimum share of -1 vertices to reach to declare fixation
         verbose : bool
             if print statements should be performed
         """
@@ -98,13 +87,13 @@ class GlauberSimulatorFixIndices(GlauberSim):
         vector = np.ones(self.t) * np.int64(-1)
 
         iterations = 0
-        fixation = np.bool_(False)
+        fixation = False
 
         # list of indices we want to look at -> all except boundary points
         # remember that self.t is the number of iterations
         # Hence may not have index zero or the last elements
         indices = np.random.randint(1, self.n_outer - 1, size=2 * self.t).reshape((self.t, 2))
-
+        logging.info("Starting Glauber Simulation")
         # the index is (row, column)
         for i, index in enumerate(indices):
             """Updates the vertex at index in the matrix"""                
@@ -150,37 +139,42 @@ class GlauberSimulatorFixIndices(GlauberSim):
 
             vector[i] = summed_array / target
 
+            if self.save_bitmaps_every is not None and (i % self.save_bitmaps_every == 0):
+                self.save_bitmap(matrix, i)
+
             if summed_array >= self.tol * target: #  only hit max once
                 logging.info(f"Fixation at +1 at iteration {i}. Share of 1 is {summed_array / target}.")
                 logging.debug(f"String Representation of Matrix: \n {str(matrix)}")
-                fixation = np.bool_(True)
+                fixation = True
                 iterations = i
                 break
             elif summed_array <= (1 - self.tol) * target: # only hit may once
                 logging.info(f"Fixation at -1 at iteration {i}. Share of 1 is {summed_array / target}." +
                               f"String Representation of Matrix: \n {str(matrix)}")
-                fixation = np.bool_(False)
+                fixation = False
                 iterations = i
                 break
 
             if (i % LOGGING_STEP == 0) and verbose:
-                logging.info(f"iteration: {i} share of 1 is: {summed_array / target}")
-
-            if self.save_bitmaps_every is not None and (i % self.save_bitmaps_every == 0):
-                self.save_bitmap(matrix, i)
+                print(f"iteration: {i} share of 1 is: {summed_array / target}")
 
         # end glauber for loop
 
         if not fixation:
             iterations = self.t
+
+        # for good measure, always save last bitmap
+        self.save_bitmap(matrix, iterations)
         
         result =  {}
 
         result.update({"fixation": fixation,
                         "iterations":iterations, 
-                        "vector": vector})
-        logging.info(f"Result: {result}")
+                        "vector": vector.tolist()})
+        logging.info(f"Result: fixation: {fixation}, iterations: {iterations}")
 
+        with open(f"{self.results_dir}/result-dict.json", "w") as f:
+            json.dump(result, f)
 
         return result
 

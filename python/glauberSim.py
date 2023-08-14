@@ -1,25 +1,27 @@
 from abc import ABC, abstractmethod
 import numpy as np
+import os
+import datetime
+import json
+
 
 class GlauberSim(ABC):
-
     def __init__(
         self,
         n_interior: np.int64,
         p: np.float64,
         t: np.int64,
         tol: np.float64,
-        padding : np.int64 = None, # for new code
+        padding: np.int64 = None,  # for new code
         n_outer: np.int64 = None,  # kept for depreceated compatibility
-        save_bitmaps_every = None
+        save_bitmaps_every=None,
+        results_dir=None,
     ) -> None:
         """Runs a simulation of the Glauber dynamics on a d-dimensional lattice of size n
         with probability p of initializing a vertex to 1
 
         Parameters
         ----------
-        padding : int
-            number of vertices beyond the border of n_interior*n_interior matrix
         n_interior : int
             dimension of inner lattice
         p : float
@@ -28,10 +30,16 @@ class GlauberSim(ABC):
             number of vertex-updates to perform
         tol : float
             minimum share of -1 vertices to reach to declare fixation
+        padding : int
+            number of vertices beyond the border of n_interior*n_interior matrix
+        save_bitmaps_every : int
+            number of iterations after which to save a bitmap of the matrix. If None, is never saved
+        results_dir : str
+            directory to save results in. If None, results are saved in a directory named after the current time
         """
         if padding is None and n_outer is None:
-            raise ValueError("padding or n_outer must be specified")    
-        
+            raise ValueError("padding or n_outer must be specified")
+
         if padding is not None:
             self.padding = padding
             self.n_outer = n_interior + 2 * padding
@@ -41,25 +49,38 @@ class GlauberSim(ABC):
             self.n_outer = self.n_outer
             self.padding = (self.n_outer - n_interior) // 2
 
-
         self.n_interior = n_interior
         self.p = p
         self.t = t
         self.tol = tol
         self.save_bitmaps_every = save_bitmaps_every
+        self.results_dir = results_dir
 
-        
+        if self.results_dir is None:
+            now = datetime.datetime.now()
+            time_string = now.strftime("%m%d_%H-%M-%S")
+            self.results_dir = f"./results/{time_string}/"
+
+        os.makedirs(self.results_dir, exist_ok=True)
+
+        parameters = {
+            "n_interior": self.n_interior,
+            "p": self.p,
+            "t": self.t,
+            "tol": self.tol,
+            "padding": self.padding,
+            "save_bitmaps_every": self.save_bitmaps_every,
+            "results_dir": self.results_dir,
+        }
+        with open(f"{self.results_dir}/simulation-params.json", "w") as f:
+            json.dump(parameters, f)
 
     @abstractmethod
-    def run_single_glauber( *args, **kwargs) -> dict:
-        pass
+    def run_single_glauber(*args, **kwargs) -> dict:
+        raise NotImplementedError()
 
     # This is not tested yet
-    def run_fixation_simulation(
-        self,
-        iter,
-        verbose: bool = False
-    ) -> dict:
+    def run_fixation_simulation(self, iter, verbose: bool = False) -> dict:
         fixations = 0
         iterations = 0
         results = []
