@@ -65,8 +65,8 @@ def plot_bitmap(dir, iter):
     matrix.load_from_file(dir + f"/iter-{iter}.bmp")
     np_mat = matrix.to_numpy()
     plt.imshow(np_mat)
-    plt.show()
+    plt.savefig(dir + f"/iter-{iter}.png")
 
 if __name__ == '__main__':
-    file = '/Users/konrad/code/school/msc-thesis/bitmap_results/0813_16-00-07'
-    plot_bitmap(file, 1500)
+    file = '/Users/konrad/code/school/msc-thesis/results/0814_16-56-10/iter-0/bitmap_results'
+    plot_bitmap(file, 20_000_000)

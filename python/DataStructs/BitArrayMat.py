@@ -17,8 +17,6 @@ class BitArrayMat:
         
 
     def idx(self, r, c):
-        assert 0 <= r < self.nrow
-        assert 0 <= c < self.ncol
         return r * self.ncol + c
     
     def get_with_slice(self, slice):

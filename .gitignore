@@ -9,3 +9,4 @@ temp/
 *.o
 *.so
 *results/*
+*.bmp

@@ -6,6 +6,8 @@ import matplotlib.pyplot as plt
 import json
 import datetime
 import os
+import sys
+import argparse
 
 from glauberFixIndices import GlauberSimulatorFixIndices
 
@@ -16,7 +18,7 @@ def run_traces(n_interior, padding, t, tol, iterations, p, results_dir):
 
     
     futures = []
-    with fts.ProcessPoolExecutor(max_workers=mp.cpu_count() // 2) as executor:
+    with fts.ProcessPoolExecutor(max_workers=mp.cpu_count()) as executor:
 
         for i in range(iterations):
             sim = GlauberSimulatorFixIndices(padding = padding,
@@ -24,8 +26,8 @@ def run_traces(n_interior, padding, t, tol, iterations, p, results_dir):
                                             p = p,
                                             t = t,
                                             tol = tol,
-                                            results_dir = result_dir + 'iter-' + str(i),
-                                            save_bitmaps_every=10_000
+                                            results_dir = result_dir + 'rep-' + str(i),
+                                            save_bitmaps_every=1_000_000
                                             )
             future = executor.submit(sim.run_single_glauber, True)
             futures.append(future)
@@ -44,18 +46,24 @@ if __name__ == "__main__":
 
     logging.basicConfig(level=logging.INFO)
 
+    parser=argparse.ArgumentParser()
+
+    parser.add_argument("--t", help="Number of iterations")
+    parser.add_argument("--n", help="Number of repetitions (how many times we run each)")
+
+    args=parser.parse_args()
+    
+    # number of time steps for each glauber dynamics iteration
+    T = int(args.t)
+
+    # number of times we run glauber dynamcis for each probability
+    ITERATIONS = int(args.n)
+
     # dimension of the lattice B
     N_INTERIOR = 1000
     # dimension of the padding around B
     PADDING = 10
-
-    # number of time steps for each glauber dynamics iteration
-    # T = int(20_000_000)
-    T = 20_000
-
-    # number of times we run glauber dynamcis for each probability
-    ITERATIONS = 4
-
+    
     # tolerance for fixation
     TOL = 0.85
 

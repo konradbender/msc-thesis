@@ -273,7 +273,7 @@ if __name__ == "__main__":
         pytest.main(
             [
                 "-c",
-                "/Users/konrad/code/school/msc-thesis/python/pyproject.toml",
+                "pyproject.toml",
                 "-k not slow and not simulation",
                 "--durations=0"
             ]
