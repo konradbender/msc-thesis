@@ -7,7 +7,7 @@
 
 echo “I am job number ${SLURM_ARRAY_JOB_ID}_${SLURM_ARRAY_TASK_ID} running on the computer ${HOSTNAME}”
 
-source python/thesis-env/bin/activate
+source thesis-env-2/bin/activate
 
 # activate venv
 python3 python/test_glauber.py
