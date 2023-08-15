@@ -60,7 +60,7 @@ if __name__ == "__main__":
     ITERATIONS = int(args.n)
 
     # dimension of the lattice B
-    N_INTERIOR = 1000
+    N_INTERIOR = 500
     # dimension of the padding around B
     PADDING = 10
     
