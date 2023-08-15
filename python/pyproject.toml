@@ -1,9 +1,5 @@
 # pyproject.toml
 [tool.pytest.ini_options]
-testpaths = [
-    "tests",
-    "integration",
-]
 log_level = "DEBUG"
 log_cli = true
 log_cli_level = "DEBUG"
