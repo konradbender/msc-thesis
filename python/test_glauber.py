@@ -274,7 +274,7 @@ if __name__ == "__main__":
             [
                 "-c",
                 "pyproject.toml",
-                "-k not slow and not simulation",
+                "-k and not simulation",
                 "--durations=0"
             ]
         )
