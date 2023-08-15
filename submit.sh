@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --job testing
 #SBATCH --cpus-per-task 5
-#SBATCH --mem 5G
+#SBATCH --mem 20G
 #SBATCH --mail-user=kobender@stats.ox.ac.uk
 #SBATCH --partition=standard-cpu
 
