@@ -27,7 +27,7 @@ def run_traces(n_interior, padding, t, tol, iterations, p, results_dir):
                                             t = t,
                                             tol = tol,
                                             results_dir = result_dir + 'rep-' + str(i),
-                                            save_bitmaps_every=1_000_000
+                                            save_bitmaps_every=100_000
                                             )
             future = executor.submit(sim.run_single_glauber, True)
             futures.append(future)
