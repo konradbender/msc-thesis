@@ -14,7 +14,7 @@ from glauberFixIndices import GlauberSimulatorFixIndices
 from copy import deepcopy
 
 
-def run_traces(n_interior, padding, t, tol, iterations, p, results_dir):
+def run_traces(n_interior, padding, t, tol, iterations, p, results_dir, checkpoints):
 
     
     futures = []
@@ -27,8 +27,9 @@ def run_traces(n_interior, padding, t, tol, iterations, p, results_dir):
                                             t = t,
                                             tol = tol,
                                             results_dir = result_dir + 'rep-' + str(i),
-                                            save_bitmaps_every=100_000
+                                            save_bitmaps_every=checkpoints,
                                             )
+            
             future = executor.submit(sim.run_single_glauber, True)
             futures.append(future)
 
@@ -50,6 +51,9 @@ if __name__ == "__main__":
 
     parser.add_argument("--t", help="Number of iterations")
     parser.add_argument("--n", help="Number of repetitions (how many times we run each)")
+    parser.add_argument("--checkpoint", help="Number of steps between checkpoint saves")
+    parser.add_argument("--n_interior", help="Size of the interior of the lattice")
+    parser.add_argument("--padding", help="Size of the padding around the lattice")
 
     args=parser.parse_args()
     
@@ -60,9 +64,11 @@ if __name__ == "__main__":
     ITERATIONS = int(args.n)
 
     # dimension of the lattice B
-    N_INTERIOR = 500
+    N_INTERIOR = int(args.n_interior)
     # dimension of the padding around B
-    PADDING = 10
+    PADDING = int(args.padding)
+
+    CHECKPOINTS = int(args.checkpoint)
     
     # tolerance for fixation
     TOL = 0.85
@@ -72,7 +78,7 @@ if __name__ == "__main__":
     result_dir = "./results/" + time_string + "/"
 
     run_traces(n_interior=N_INTERIOR, padding=PADDING, t=T, tol=TOL, 
-               iterations=ITERATIONS, p=P, results_dir = result_dir)
+            iterations=ITERATIONS, p=P, results_dir = result_dir, checkpoints=CHECKPOINTS)
 
     params = {
         "n_interior": N_INTERIOR,
