@@ -1,8 +1,7 @@
 #!/bin/bash
 #SBATCH --job testing
-#SBATCH --cpus-per-task 5
 #SBATCH --mem 16G
-#SBATCH --mail-user=konrad.bender@exeter.ox.ac.uk
+#SBATCH --mail-user=kobender@stats.ox.ac.uk
 #SBATCH --partition=standard-cpu
 
 echo “I am job number ${SLURM_ARRAY_JOB_ID}_${SLURM_ARRAY_TASK_ID} running on the computer ${HOSTNAME}”
@@ -10,10 +9,14 @@ echo “I am job number ${SLURM_ARRAY_JOB_ID}_${SLURM_ARRAY_TASK_ID} running on 
 # activate venv
 source thesis-env-2/bin/activate
 
-T=20000000
+T=2000
 N=4
 CHECKPOINT=10000
-N_INT=200
+
+# THE FOLLOWING TWO MUST BE MANUALLY ALIGNED
+N_INT=4
+#SBATCH --cpus-per-task 5
+
 PADDING=10
 
 # run the script

@@ -18,7 +18,7 @@ def run_traces(n_interior, padding, t, tol, iterations, p, results_dir, checkpoi
 
     
     futures = []
-    with fts.ProcessPoolExecutor(max_workers=mp.cpu_count()) as executor:
+    with fts.ProcessPoolExecutor(max_workers=iterations) as executor:
 
         for i in range(iterations):
             sim = GlauberSimulatorFixIndices(padding = padding,
@@ -47,6 +47,10 @@ if __name__ == "__main__":
     os.makedirs("./results", exist_ok=True)
 
     logging.basicConfig(level=logging.INFO)
+
+    logging.info("starting " + time_string)
+    logging.info("number of cores: " + str(mp.cpu_count()))
+
 
     parser=argparse.ArgumentParser()
 

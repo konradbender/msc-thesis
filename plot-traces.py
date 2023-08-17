@@ -43,7 +43,7 @@ def plot_trace(dir):
     plt.savefig(f"{dir}/trace.png")
 
 if __name__ == '__main__':
-    result_dir = "/Users/konrad/code/school/msc-thesis/results/from-remote/0816_14-09-47"
+    result_dir = "/Users/konrad/code/school/msc-thesis/results/from-remote/0817_11-52-28"
     content = os.listdir(result_dir)
     for dir in content:
         if (dir.startswith('rep-')):
