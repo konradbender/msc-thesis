@@ -28,6 +28,7 @@ def run_traces(n_interior, padding, t, tol, iterations, p, results_dir, checkpoi
                                             tol = tol,
                                             results_dir = result_dir + 'rep-' + str(i),
                                             save_bitmaps_every=checkpoints,
+                                            random_seed=i
                                             )
             
             future = executor.submit(sim.run_single_glauber, True)
