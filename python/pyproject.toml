@@ -1,7 +1,7 @@
 # pyproject.toml
 [tool.pytest.ini_options]
 log_level = "DEBUG"
-log_cli = false
+log_cli = true
 log_cli_level = "DEBUG"
 markers = [
     "slow: marks tests as slow (deselect with '-m \"not slow\"')",
