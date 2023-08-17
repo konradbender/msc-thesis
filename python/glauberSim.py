@@ -3,6 +3,7 @@ import numpy as np
 import os
 import datetime
 import json
+import logging
 
 
 class GlauberSim(ABC):
@@ -16,6 +17,7 @@ class GlauberSim(ABC):
         n_outer: np.int64 = None,  # kept for depreceated compatibility
         save_bitmaps_every=None,
         results_dir=None,
+        random_seed=None,
     ) -> None:
         """Runs a simulation of the Glauber dynamics on a d-dimensional lattice of size n
         with probability p of initializing a vertex to 1
@@ -74,6 +76,10 @@ class GlauberSim(ABC):
         }
         with open(f"{self.results_dir}/simulation-params.json", "w") as f:
             json.dump(parameters, f)
+
+        if random_seed is not None:
+            np.random.seed(random_seed)
+            logging.warning("random seed set to " + str(random_seed))
 
     @abstractmethod
     def run_single_glauber(*args, **kwargs) -> dict:

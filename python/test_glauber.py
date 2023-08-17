@@ -231,6 +231,11 @@ class TestSingleGlauber:
         result = sim.run_single_glauber(False)
         assert(result["fixation"] == False and result["iterations"] == 2000)
 
+    def test_seed(self, class_to_test: type[GlauberSim]):
+        sim = class_to_test(n_interior=84, padding=3, p=0.7, t=2000, tol=0.85, random_seed=69)
+        result = sim.run_single_glauber(False)
+        assert(result["fixation"] == False and result["iterations"] == 2000)
+
     @pytest.mark.slow
     def test_large_long(self, class_to_test: type[GlauberSim]):
         np.random.seed(0)
@@ -274,7 +279,7 @@ if __name__ == "__main__":
             [
                 "-c",
                 "python/pyproject.toml",
-                "-k not simulation",
+                "-k not simulation and not slow",
                 "--durations=0"
             ]
         )
