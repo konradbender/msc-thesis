@@ -58,7 +58,7 @@ def check_for_checkpoints(results_dir, params_dict):
 
 def create_sim_and_submit(*args, **kwargs):
         sim = GlauberSimulatorFixIndices(*args, **kwargs)
-        result = sim.run_single_glauber(verbose=False)
+        result = sim.run_single_glauber(verbose=True)
         return result
 
 def run_traces(n_interior, padding, t, tol, iterations, p, results_dir, checkpoint_int, warmstarts):

@@ -13,7 +13,7 @@ from DataStructs.BitArrayMat import BitArrayMat
 from glauberSim import GlauberSim
 
 
-LOGGING_STEP = 10000
+LOGGING_STEP = 100_000
 BOUNDARY = 1
 DEBUG = False
 

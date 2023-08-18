@@ -2,6 +2,8 @@
 #SBATCH --job redo-the-500-20M
 #SBATCH --mem 16G
 #SBATCH --partition=standard-cpu
+#SBATCH --export=ALL
+#SBATCH --mail-type=all
 
 # THE FOLLOWING TWO MUST BE MANUALLY ALIGNED -  ONCE ORE MORE THAN ITERS
 N=4
@@ -11,12 +13,14 @@ echo “I am job number ${SLURM_ARRAY_JOB_ID}_${SLURM_ARRAY_TASK_ID} running on 
 
 # activate venv
 source /vols/teaching/msc-projects/2022-2023/kobender/msc-thesis/thesis-env-2/bin/activate
+which python
+echo $PATH
 
 T=20000000 # time steps
 N_INT=500 # n_interior, so the size of the grid
 CHECKPOINT=1000000 # steps between model checkpoints
 
-PADDING=10
+PADDING=10 # padding for the grid
 
 # run the script
 python3 python/run_multiple_for_traces.py --t=$T --n=$N --checkpoint=$CHECKPOINT --n_int=$N_INT --padding=$PADDING 
