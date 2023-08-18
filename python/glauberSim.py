@@ -18,6 +18,7 @@ class GlauberSim(ABC):
         save_bitmaps_every=None,
         results_dir=None,
         random_seed=None,
+        checkpoint_file=None
     ) -> None:
         """Runs a simulation of the Glauber dynamics on a d-dimensional lattice of size n
         with probability p of initializing a vertex to 1
@@ -38,7 +39,33 @@ class GlauberSim(ABC):
             number of iterations after which to save a bitmap of the matrix. If None, is never saved
         results_dir : str
             directory to save results in. If None, results are saved in a directory named after the current time
+        random_seed : int
+            random seed to use for numpy
+        checkpoint_file : str
+            path to a checkpoint file to start from. If None, starts from random initialization
         """
+        self.results_dir = results_dir
+
+        if self.results_dir is None:
+            now = datetime.datetime.now()
+            time_string = now.strftime("%m%d_%H-%M-%S")
+            self.results_dir = f"./results/{time_string}/"
+
+        os.makedirs(self.results_dir, exist_ok=True)
+
+        # create a new logging file for each instance
+        pid = os.getpid()
+        self.logger = logging.getLogger(__name__ + '.' +  str(pid))
+        self.logger.setLevel(logging.DEBUG)
+        
+        # create file handler which logs even debug messages
+        fh = logging.FileHandler(filename=f'{self.results_dir}/log-{pid}.log')
+        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        fh.setFormatter(formatter)
+        fh.setLevel(logging.DEBUG)
+        self.logger.addHandler(fh)
+
+
         if padding is None and n_outer is None:
             raise ValueError("padding or n_outer must be specified")
 
@@ -56,14 +83,9 @@ class GlauberSim(ABC):
         self.t = t
         self.tol = tol
         self.save_bitmaps_every = save_bitmaps_every
-        self.results_dir = results_dir
+        self.checkpoint_file = checkpoint_file
 
-        if self.results_dir is None:
-            now = datetime.datetime.now()
-            time_string = now.strftime("%m%d_%H-%M-%S")
-            self.results_dir = f"./results/{time_string}/"
-
-        os.makedirs(self.results_dir, exist_ok=True)
+        
 
         parameters = {
             "n_interior": self.n_interior,
@@ -79,7 +101,10 @@ class GlauberSim(ABC):
 
         if random_seed is not None:
             np.random.seed(random_seed)
-            logging.warning("random seed set to " + str(random_seed))
+            self.logger.warning("random seed set to " + str(random_seed))
+
+        
+        
 
     @abstractmethod
     def run_single_glauber(*args, **kwargs) -> dict:
@@ -107,3 +132,9 @@ class GlauberSim(ABC):
             "n_inner": self.n_interior,
             "t": self.t,
         }
+    
+    def checkpoint_available(self):
+        if self.checkpoint_file is None:
+            return False
+        return True
+        
