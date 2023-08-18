@@ -231,8 +231,25 @@ class TestSingleGlauber:
         result = sim.run_single_glauber(False)
         assert(result["fixation"] == False and result["iterations"] == 2000)
 
+    def test_small_checkpoints(self, class_to_test: type[GlauberSim]):
+        np.random.seed(0)
+        sim = class_to_test(n_interior=84, padding=3, p=0.7, t=1000, tol=0.85, results_dir="./results/test_small_long")
+        result_1 = sim.run_single_glauber(False)
+        checkpoint_dir = sim.results_dir
+
+        sim_2 = class_to_test(n_interior=84, padding=3, p=0.7, t=2000, tol=0.85, 
+                              checkpoint_file=f"{checkpoint_dir}/bitmap_results/iter-1000.bmp")
+        result_2 = sim_2.run_single_glauber(False)
+
+        assert(result_2["fixation"] == False and result_2["iterations"] == 2000)
+
     def test_seed(self, class_to_test: type[GlauberSim]):
         sim = class_to_test(n_interior=84, padding=3, p=0.7, t=2000, tol=0.85, random_seed=69)
+        result = sim.run_single_glauber(False)
+        assert(result["fixation"] == False and result["iterations"] == 2000)
+
+    def test_zero_padding(self, class_to_test: type[GlauberSim]):
+        sim = class_to_test(n_interior=84, padding=0, p=0.7, t=2000, tol=0.85, random_seed=69)
         result = sim.run_single_glauber(False)
         assert(result["fixation"] == False and result["iterations"] == 2000)
 
