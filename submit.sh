@@ -4,7 +4,7 @@
 #SBATCH --partition=standard-cpu
 
 # THE FOLLOWING TWO MUST BE MANUALLY ALIGNED -  ONCE ORE MORE THAN ITERS
-N_INT=4
+N=4
 #SBATCH --cpus-per-task 5
 
 #SBATCH --mail-user=kobender@stats.ox.ac.uk
@@ -19,9 +19,9 @@ echo “I am job number ${SLURM_ARRAY_JOB_ID}_${SLURM_ARRAY_TASK_ID} running on 
 # activate venv
 source thesis-env-2/bin/activate
 
-T=20000000
-N=4
-CHECKPOINT=1000000
+T=20000000 # time steps
+N_INT=500 # n_interior, so the size of the grid
+CHECKPOINT=1000000 # steps between model checkpoints
 
 PADDING=10
 
