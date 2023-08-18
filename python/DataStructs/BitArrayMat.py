@@ -76,6 +76,7 @@ class BitArrayMat:
         self.arr = ba()
         with open(path, "rb") as f:
             self.arr.fromfile(f)
+        self.arr = self.arr[:self.nrow * self.ncol].copy()
 
     def to_numpy(self):
         try:
