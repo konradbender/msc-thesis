@@ -6,8 +6,6 @@ import matplotlib.pyplot as plt
 import json
 import datetime
 import os
-import glauber2D
-import glauberFast
 
 
 if __name__ == "__main__":
