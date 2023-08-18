@@ -176,7 +176,8 @@ class GlauberSimulatorFixIndices(GlauberSim):
                 iterations = i
                 break
             elif summed_array <= (1 - self.tol) * target: # only hit may once
-                self.logger.info(f"Fixation at -1 at iteration {i}. Share of 1 is {summed_array / target}." +
+                self.logger.info(f"Fixation at -1 at iteration {i}. Share of 1 is {summed_array / target}.")
+                self.logger.debug(
                               f"String Representation of Matrix: \n {str(matrix)}")
                 fixation = False
                 iterations = i

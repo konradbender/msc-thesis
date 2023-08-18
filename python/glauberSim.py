@@ -56,7 +56,7 @@ class GlauberSim(ABC):
         # create a new logging file for each instance
         pid = os.getpid()
         self.logger = logging.getLogger(__name__ + '.' +  str(pid))
-        self.logger.setLevel(logging.DEBUG)
+        self.logger.setLevel(logging.INFO)
         
         # create file handler which logs even debug messages
         fh = logging.FileHandler(filename=f'{self.results_dir}/log-{pid}.log')
