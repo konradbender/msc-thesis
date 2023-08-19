@@ -1,11 +1,12 @@
 #!/bin/bash
-#SBATCH --job run unit tests
+#SBATCH --job run-unit-tests
 #SBATCH --mem 16G
 #SBATCH --partition=standard-cpu
 #SBATCH --export=ALL
 #SBATCH --mail-type=all
 
 # THE FOLLOWING TWO MUST BE MANUALLY ALIGNED -  ONCE ORE MORE THAN ITERS
+
 #SBATCH --cpus-per-task 5
 
 echo “I am job number running on the computer ${HOSTNAME}”
