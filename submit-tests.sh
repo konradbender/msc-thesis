@@ -16,4 +16,4 @@ source /vols/teaching/msc-projects/2022-2023/kobender/msc-thesis/thesis-env-2/bi
 which python
 echo $PATH
 
-python3 pytest --durations=0 -c pyproject.toml
+pytest --durations=0 -c pyproject.toml
