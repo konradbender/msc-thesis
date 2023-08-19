@@ -1,7 +1,10 @@
 #!/bin/bash
 #SBATCH --job run-unit-tests
 #SBATCH --mem 16G
+
 #SBATCH --partition=standard-cpu
+#SBATCH --nodelist=garganey.stats.ox.ac.uk
+
 #SBATCH --export=ALL
 #SBATCH --mail-type=all
 
