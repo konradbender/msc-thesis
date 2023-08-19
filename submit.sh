@@ -9,7 +9,7 @@
 N=4
 #SBATCH --cpus-per-task 5
 
-echo “I am job number ${SLURM_ARRAY_JOB_ID}_${SLURM_ARRAY_TASK_ID} running on the computer ${HOSTNAME}”
+echo “I am job running on the computer ${HOSTNAME}”
 
 # activate venv
 source /vols/teaching/msc-projects/2022-2023/kobender/msc-thesis/thesis-env-2/bin/activate
