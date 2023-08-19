@@ -140,6 +140,9 @@ class Main:
                 result = future.result()
 
     def main(self, args = None):
+
+        # if the script is run from the command line, args will be None, so the parser
+        # will just use the supplied command line arguments
         
         np.random.seed(0)
 
