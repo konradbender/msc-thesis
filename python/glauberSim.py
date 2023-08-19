@@ -102,6 +102,9 @@ class GlauberSim(ABC):
         if random_seed is not None:
             np.random.seed(random_seed)
             self.logger.warning("random seed set to " + str(random_seed))
+        else:
+            np.random.seed(os.getpid())
+            self.logger.warning("random seed set to " + str(os.getpid()))
 
         
         
