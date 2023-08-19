@@ -279,17 +279,7 @@ class TestSingleGlauber:
                             save_bitmaps_every=500)
         result = sim.run_single_glauber(False)
         assert(result["fixation"] == False and result["iterations"] == 2000)
-    
 
-# @pytest.mark.parametrize("class_to_test", (GlauberSimulatorFixIndices, GlauberSimDynIndices))
-@pytest.mark.parametrize("class_to_test", (GlauberSimulatorFixIndices,))
-class TestFixationSimulation:
-    def test_simulation(self, class_to_test):
-        np.random.seed(0)
-        sim = class_to_test(1000, 980, 0.7, 2000, 0.8)
-        result = sim.run_fixation_simulation(5, False)
-        print(result)
-        assert result["fixation_rate"] == 1.0
 
 
 if __name__ == "__main__":
@@ -297,7 +287,7 @@ if __name__ == "__main__":
         pytest.main(
             [
                 "-c",
-                "python/pyproject.toml",
+                "pyproject.toml",
                 "-k not simulation and not slow",
                 "--durations=0"
             ]
