@@ -62,7 +62,7 @@ class GlauberSim(ABC):
         fh = logging.FileHandler(filename=f'{self.results_dir}/log-{pid}.log')
         formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
         fh.setFormatter(formatter)
-        fh.setLevel(logging.DEBUG)
+        fh.setLevel(logging.INFO)
         self.logger.addHandler(fh)
 
 
