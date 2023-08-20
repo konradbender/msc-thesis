@@ -2,7 +2,7 @@ import random
 
 
 class ListDict(object):
-    def __init__(self):
+    def __init__(self, n_row, n_col):
         self.item_to_position = {}
         self.items = []
 
