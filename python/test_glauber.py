@@ -287,7 +287,7 @@ class TestSingleGlauber:
     def test_small_bitmap(self, class_to_test: type[GlauberSim], tmpdir):
         tmpdir = str(tmpdir)
         sim = class_to_test(n_interior=84, padding=3, p=0.95, t=2000, tol=0.96,
-                            save_bitmaps_every=500, random_seed=0, tmpdir=tmpdir)
+                            save_bitmaps_every=500, random_seed=0, results_dir=tmpdir)
         result = sim.run_single_glauber(False)
         assert(result["fixation"] == False and result["iterations"] == 2000)
 
