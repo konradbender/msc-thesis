@@ -16,10 +16,11 @@ LOGGING_STEP = 1000
 
 class GlauberSimDynIndices(GlauberSimBitArray):
 
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(self, purge_interval = None, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.logger.info(f"Initializing GlauberSimDynIndices with parameters: {kwargs}." + 
                      f" Running on PID {os.getpid()}")
+        self.purge_interval = purge_interval
 
     
     def setup_indices(self) -> None:

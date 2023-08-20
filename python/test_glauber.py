@@ -25,8 +25,9 @@ class TestSingleGlauber:
         assert result["fixation"] == False and result["iterations"] == 2000
 
     def test_small_checkpoints(self, class_to_test: type[GlauberSim], tmpdir):
+        tmpdir = str(tmpdir)
         np.random.seed(0)
-        if os.path.isdir("./results/test_small_long"):
+        if os.path.isdir("./results/test_small_longpppp"):
             shutil.rmtree("./results/test_small_long")
         sim = class_to_test(
             n_interior=84,
@@ -34,7 +35,7 @@ class TestSingleGlauber:
             p=0.7,
             t=1000,
             tol=0.85,
-            results_dir="./results/test_small_long",
+            results_dir=tmpdir
         )
         result_1 = sim.run_single_glauber(False)
         checkpoint_dir = sim.results_dir
