@@ -18,6 +18,7 @@ LOG_DIR = "./logs/"
 parser=argparse.ArgumentParser()
 
 parser.add_argument("--t", help="Number of iterations")
+parser.add_argument("--p", help="Probability of +1 at initialization")
 parser.add_argument("--n", help="Number of repetitions (how many times we run each)")
 parser.add_argument("--checkpoint", help="Number of steps between checkpoint saves")
 parser.add_argument("--n_interior", help="Size of the interior of the lattice")
@@ -74,17 +75,17 @@ class Main:
 
         format = "%m%d_%H-%M-%S"
 
-        contents = os.listdir(self.result_dir)
+        contents = os.listdir(RESULT_DIR)
         runs = []
         for c in contents:
-            if c == self.result_dir:
+            if c == self.time_string:
                 continue
             try:
                 dt = datetime.datetime.strptime(c, format)  
             except ValueError as e:
                 self.logger.info("found non-date directory: " + c)
                 break
-            files_of_run = os.listdir(self.result_dir + c)
+            files_of_run = os.listdir(RESULT_DIR + c)
             if "iterative-params.json" not in files_of_run:
                 self.logger.info("found directory without iterative-params.json: " + c)
             else:
@@ -171,7 +172,7 @@ class Main:
         # tolerance for fixation
         TOL = 0.85
 
-        P = 0.505
+        P = int(args.p)
 
         params = {
             "n_interior": N_INTERIOR,

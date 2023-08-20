@@ -15,8 +15,7 @@ import shutil
 class TestSingleGlauber:
 
     def test_small_1(self, class_to_test: type[GlauberSim]):
-        np.random.seed(0)
-        sim = class_to_test(padding=1, n_interior=5, p=0.7, t=200, tol=0.98)
+        sim = class_to_test(padding=1, n_interior=5, p=0.7, t=200, tol=0.98, random_seed=0)
         result = sim.run_single_glauber(True)
         np.testing.assert_array_equal(
             result["vector"],
@@ -274,9 +273,8 @@ class TestSingleGlauber:
         assert pytest.approx(result["iterations"], 200) == 196555
 
     def test_small_bitmap(self, class_to_test: type[GlauberSim]):
-        np.random.seed(0)
         sim = class_to_test(n_interior=84, padding=3, p=0.95, t=2000, tol=0.96,
-                            save_bitmaps_every=500)
+                            save_bitmaps_every=500, random_seed=0)
         result = sim.run_single_glauber(False)
         assert(result["fixation"] == False and result["iterations"] == 2000)
 
