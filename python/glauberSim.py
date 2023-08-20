@@ -4,6 +4,12 @@ import os
 import datetime
 import json
 import logging
+import random
+
+import itertools
+
+DEBUG = False
+LOGGING_STEP = 100_000
 
 
 class GlauberSim(ABC):
@@ -56,10 +62,18 @@ class GlauberSim(ABC):
 
         os.makedirs(self.results_dir, exist_ok=True)
 
+        self.bitmap_dir = f"{self.results_dir}/bitmap_results/"
+            
+        os.makedirs(self.bitmap_dir, exist_ok=True)
+
         # create a new logging file for each instance
         pid = os.getpid()
         self.logger = logging.getLogger(__name__ + '.' +  str(pid))
-        self.logger.setLevel(logging.INFO)
+
+        if DEBUG:
+            self.logger.setLevel(logging.DEBUG)
+        else:
+            self.logger.setLevel(logging.INFO)
         
         # create file handler which logs even debug messages
         fh = logging.FileHandler(filename=f'{self.results_dir}/log-{pid}.log')
@@ -104,43 +118,222 @@ class GlauberSim(ABC):
 
         if random_seed is not None:
             np.random.seed(random_seed)
+            random.seed(random_seed)
             self.logger.warning("random seed set to " + str(random_seed))
         else:
             np.random.seed(os.getpid())
+            random.seed(os.getpid())
             self.logger.warning("random seed set to " + str(os.getpid()))
 
-        
-        
+        self.matrix = None
+        self.indices = None
+        self.interior_mask = None
 
-    @abstractmethod
-    def run_single_glauber(*args, **kwargs) -> dict:
-        raise NotImplementedError()
-
-    # This is not tested yet
-    def run_fixation_simulation(self, iter, verbose: bool = False) -> dict:
-        fixations = 0
-        iterations = 0
-        results = []
-
-        for i in range(iter):
-            result = self.run_single_glauber(verbose=verbose)
-            results.append(result)
-            fixations += result["fixation"]
-            if result["fixation"]:
-                iterations += result["iterations"]
-
-        mean_iterations = iterations / fixations if fixations > 0 else 0
-        return {
-            "fixation_rate": fixations / iter,
-            "mean_iterations_when_fix": mean_iterations,
-            "p": self.p,
-            "n_outer": self.n_outer,
-            "n_inner": self.n_interior,
-            "t": self.t,
-        }
-    
+    @property        
     def checkpoint_available(self):
         if self.checkpoint_file is None:
             return False
         return True
+    
+    def teardown_sim(self):
+        """teardown_sim is called after each simulation run to reset the state of the simulator"""
+        self.matrix = None
+        self.indice = None
+        self.interior_mask = None
+    
+    @abstractmethod
+    def load_checkpoint_index(self) -> np.ndarray:
+        """ loads the index from the checkpoint file name - note that it must be in the format '*-<index>.<ending>'"""
+        raise NotImplementedError()
+    
+    @abstractmethod    
+    def setup_matrix(self) -> None:
+        """setup_matrix initializes the matrix to be used in the simulation. Needs to be indexable by [i, j]"""
+        raise NotImplementedError()
+
+    @abstractmethod
+    def setup_interior_mask(self) -> None:
+        """setup_interior_mask initializes the interior mask to be used in the simulation No requirements, but needs to work with
+        self.sum_ones()"""
+        raise NotImplementedError()
+    
+    @abstractmethod
+    def sum_ones(self) -> int:
+        """sum_ones returns the number of ones in the interior of the matrix"""
+        raise NotImplementedError()
+
+    @abstractmethod
+    def setup_indices(self) -> None:
+        """setup_indices initializes the indices to be used in the simulation. Needs to be indexable by [i] and return a tuple"""
+        # TODO make method get_next_index() that returns the next index to be updated
+        raise NotImplementedError()
+    
+    @abstractmethod
+    def get_index(self, i) -> tuple:
+        """get_index returns the index at position for the ith update"""
+        raise NotImplementedError()
+
+    @abstractmethod
+    def remove_vertex_from_indices(self, index: tuple) -> None:
+        """removes the given index from the indices to be updated"""
+        raise NotImplementedError()
+
+    @abstractmethod
+    def add_dyn_neighbors_to_indices(self, index: tuple) -> None:
+        """adds the dynamic (i.e., not fixated) neighbors of the given index to the indices to be updated"""
+        raise NotImplementedError()
+
+    def run_single_glauber(
+        self,
+        verbose: bool = False,
+        *args, **kwargs
+    ) -> dict:
+        """Runs a simulation of the Glauber dynamics on a d-dimensional lattice of size n
+        with probability p of initializing a vertex to 1
+        
+        Parameters
+        ----------
+        verbose : bool
+            if print statements should be performed
+        """
+        
+        self.logger.info(f"Simulation Running on proccess with PID {os.getpid()}")
+
+        self.setup_matrix()
+
+        # this is the padding between inner and outer lattice - 
+        # has nothing to do with the boundary condition
+        self.logger.debug(f"buffer: {self.padding}")
+
+        self.setup_interior_mask()
+
+        # this is the case if all interior vertices were one, disregarding the 
+        # possibility of setting some tolerance
+        target = self.n_interior**2
+        self.logger.debug(f"Target: {target}")
+
+        vector = np.ones(self.t) * np.int64(-1)
+
+        iterations = 0
+        fixation = False
+
+        # Do the warmstarting here
+
+        if self.checkpoint_available:
+            self.logger.info("Checkpoint available, trying to load matrix and index")
+            try:
+                self.matrix = self.load_checkpoint_matrix()
+                last_index = self.load_checkpoint_index()
+            except FileNotFoundError as e:
+                self.logger.error("Checkpoint file not found, starting from scratch")
+                last_index = -1
+                pass
+            
+        else:
+            last_index = -1
+
+        self.setup_indices()
+
+        self.logger.info("Starting Glauber Simulation at index " + str(last_index + 1))
+
+        # the index is (row, column)
+        for i in itertools.islice(range(0, self.t), last_index + 1, None):
+            """Updates the vertex at index in the matrix""" 
+
+            index = self.get_index(i)
+
+            nb_left = self.matrix[index[0], index[1] - 1]
+            nb_right = self.matrix[index[0], index[1] + 1]
+            nb_up = self.matrix[index[0] - 1, index[1]]
+            nb_down = self.matrix[index[0] + 1, index[1]]              
+
+            nb_sum = (
+                nb_left + nb_right + nb_up + nb_down
+            )
+       
+            if nb_sum > 2:
+                if DEBUG:
+                    self.logger.debug(f"Matrix before update at index {index}: \n" + self.matrix.debug_string(index))
+                    self.logger.debug(f"Sum of neighbors for index {index}: {nb_sum}")
+                    self.logger.debug(f"setting vertex at index {index} to 1")
+
+                self.matrix[index[0], index[1]] = 1
+                # more than 2 neighbors are 1, so it is fixated
+                self.remove_vertex_from_indices(index)
+                
+            # d is half the number of neighbors
+            if nb_sum < 2:
+                if DEBUG:
+                    self.logger.debug(f"Matrix before update at index {index}: \n" + self.matrix.debug_string(index))
+                    self.logger.debug(f"Sum of neighbors for index {index}: {nb_sum}")
+                    self.logger.debug(f"setting vertex at index {index} to 0")
+
+                self.matrix[index[0], index[1]] = 0
+                # more than 2 neighbors are 0, so it is fixated
+                self.remove_vertex_from_indices(index)
+                    
+
+            if nb_sum == 2:
+                # flip coin
+                z = np.random.binomial(n=1, p=np.float64(0.5))
+                if DEBUG:
+                    self.logger.debug(f"Matrix before update at index {index}: \n" + self.matrix.debug_string(index))
+                    self.logger.debug(f"Sum of neighbors for index {index}: {nb_sum}")
+                    self.logger.debug(f"flipping coin for vertex at index {index}, result is {z}")
+                
+                self.matrix[index[0], index[1]] = z
+                # do not add vertex to list of those that can flip because its neighbors are still tied
+
+            summed_array = self.sum_ones()
+
+            vector[i] = summed_array / target
+
+            if self.save_bitmaps_every is not None and (i % self.save_bitmaps_every == 0):
+                self.save_bitmap(i)
+
+            if summed_array >= self.tol * target: #  only hit max once
+                self.logger.info(f"Fixation at +1 at iteration {i}. Share of 1 is {summed_array / target}.")
+                self.logger.debug(f"String Representation of Matrix: \n {str(self.matrix)}")
+                fixation = True
+                iterations = i
+                break
+            elif summed_array <= (1 - self.tol) * target: # only hit may once
+                self.logger.info(f"Fixation at -1 at iteration {i}. Share of 1 is {summed_array / target}.")
+                self.logger.debug(
+                              f"String Representation of Matrix: \n {str(self.matrix)}")
+                fixation = False
+                iterations = i
+                break
+
+            if (i % LOGGING_STEP == 0) and verbose:
+                self.logger.info(f"iteration: {i} share of 1 is: {summed_array / target}")
+                self.logger.info(f"Number of vertices available for update: {len(self.indices)}")
+
+            self.add_dyn_neighbors_to_indices(index)
+
+            if DEBUG:
+                self.logger.debug(f"Number of vertices available for update: {len(self.indices)}")
+
+        # end glauber for loop
+
+        if not fixation:
+            iterations = self.t
+
+        # for good measure, always save last bitmap
+        self.save_bitmap(iterations)
+        
+        result =  {}
+
+        result.update({"fixation": fixation,
+                        "iterations":iterations, 
+                        "vector": vector.tolist()})
+        self.logger.info(f"Result: fixation: {fixation}, iterations: {iterations}")
+
+        with open(f"{self.results_dir}/result-dict.json", "w") as f:
+            json.dump(result, f)
+
+        self.teardown_sim()
+
+        return result
+
         
