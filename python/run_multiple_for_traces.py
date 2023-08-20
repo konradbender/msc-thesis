@@ -13,7 +13,6 @@ import gitinfo
 from glauberFixIndices import GlauberSimulatorFixIndices
 
 RESULT_DIR = "./results/"
-LOG_DIR = "./logs/"
 
 parser=argparse.ArgumentParser()
 
@@ -25,6 +24,7 @@ parser.add_argument("--n_interior", help="Size of the interior of the lattice")
 parser.add_argument("--padding", help="Size of the padding around the lattice")
 parser.add_argument("--force_new", help="Can surpress checkpoint loading",
                     action="store_true")
+parser.add_argument("--tol", help="Tolerance to determine fixation")
 
 
 def create_sim_and_submit(*args, **kwargs):
@@ -92,16 +92,16 @@ class Main:
                 runs.append(dt)
         
         if len(runs) == 0:
-            self.logger.info("no runs found in directory " + self.result_dir)
+            self.logger.info("no runs found in directory " + RESULT_DIR)
             return None 
         
         runs.sort()
         last_run = runs[-1]
         last_run_str = datetime.datetime.strftime(last_run, format)
-        self.logger.info("last run in directory " + self.result_dir + " was " + str(last_run))
+        self.logger.info("last run in directory " + RESULT_DIR + " was " + str(last_run))
 
         last_params = {}
-        with open(self.result_dir + datetime.datetime.strftime(last_run, format) + "/iterative-params.json") as f:
+        with open(RESULT_DIR + datetime.datetime.strftime(last_run, format) + "/iterative-params.json") as f:
             last_params = json.load(f)
         for key, value in params_dict.items():
             if value != last_params[key]:
@@ -110,7 +110,7 @@ class Main:
         
         self.logger.info("last run had same parameters, returning checkpoint directories")
 
-        reps = os.listdir(self.result_dir + last_run_str + "/")
+        reps = os.listdir(RESULT_DIR + last_run_str + "/")
         reps = [last_run_str + '/' + x for x in reps if x.startswith("rep-")]
 
         return reps
@@ -170,9 +170,13 @@ class Main:
         FORCE_NEW = bool(args.force_new)
         
         # tolerance for fixation
-        TOL = 0.85
+        if args.tol is None:
+            self.logger.info("tolerance was not set, using default 1")
+            TOL = 1
+        else:
+            TOL = float(args.tol)
 
-        P = int(args.p)
+        P = float(args.p)
 
         params = {
             "n_interior": N_INTERIOR,
