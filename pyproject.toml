@@ -7,5 +7,6 @@ markers = [
     "slow: marks tests as slow (deselect with '-m \"not slow\"')",
     "serial",
 ]
+addopts = "--durations=0"
 
 
