@@ -49,7 +49,7 @@ class BitArrayMat:
 
         return result
     
-    def debug_print(self, index):
+    def debug_string(self, index):
         # x, y is row, col
         x, y = index
         result = ""
@@ -63,6 +63,9 @@ class BitArrayMat:
             result += "\n"
 
         return result
+    
+    def debug_print(self, index):
+        print(self.debug_string(index))
     
     @property
     def shape(self):
