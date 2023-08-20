@@ -44,7 +44,11 @@ class GlauberSimulatorFixIndices(GlauberSim):
     def load_checkpoint_matrix(self) -> BitArrayMat:
         self.logger.info("Loading checkpoint matrix")
         matrix = BitArrayMat(self.n_outer, self.n_outer)
-        matrix.load_from_file(self.checkpoint_file)
+        try:
+            matrix.load_from_file(self.checkpoint_file)
+        except FileNotFoundError:
+            self.logger.error("Checkpoint file not found")
+            raise FileNotFoundError
         return matrix
     
     def load_checkpoint_index(self) -> np.ndarray:
@@ -108,9 +112,15 @@ class GlauberSimulatorFixIndices(GlauberSim):
         # Do the warmstarting here
 
         if self.checkpoint_available():
-            self.logger.info("Checkpoint available, loading matrix and index")
-            matrix = self.load_checkpoint_matrix()
-            last_index = self.load_checkpoint_index()
+            self.logger.info("Checkpoint available, trying to load matrix and index")
+            try:
+                matrix = self.load_checkpoint_matrix()
+                last_index = self.load_checkpoint_index()
+            except FileNotFoundError as e:
+                self.logger.error("Checkpoint file not found, starting from scratch")
+                last_index = -1
+                pass
+            
         else:
             last_index = -1
 
