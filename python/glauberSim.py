@@ -50,6 +50,9 @@ class GlauberSim(ABC):
             now = datetime.datetime.now()
             time_string = now.strftime("%m%d_%H-%M-%S")
             self.results_dir = f"./results/{time_string}/"
+            logging.info(f"results_dir not specified, using {self.results_dir}")
+        else:
+            logging.info(f"results_dir specified, using {self.results_dir}")
 
         os.makedirs(self.results_dir, exist_ok=True)
 
