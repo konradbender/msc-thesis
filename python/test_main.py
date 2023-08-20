@@ -4,7 +4,9 @@ import sys
 import numpy as np
 import json
 
-def test_main_1():
+def test_main_1(tmpdir):
+
+    tmpdir = str(tmpdir) + "/"
 
     t = 2000
     n = 4
@@ -17,12 +19,13 @@ def test_main_1():
         f"--n_int={n_int} --padding={padding} --p={p} --force_new"
     
     try:
-        main  = Main()
+        main  = Main(result_dir=tmpdir)
         main.main(options.split())
     except SystemExit:
         pass
 
-def test_main_2():
+def test_main_2(tmpdir):
+    tmpdir = str(tmpdir) +  "/"
 
     t = 200
     n = 1
@@ -37,7 +40,7 @@ def test_main_2():
     
     
     try:
-        main  = Main()
+        main  = Main(result_dir=tmpdir)
         main.main(options.split())
     except SystemExit:
         pass

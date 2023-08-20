@@ -37,10 +37,16 @@ class Main:
     
     def __init__(self, *args, **kwargs) -> None:
 
+        overwrite_result_dir = kwargs.get("result_dir", None)
+
         self.now = datetime.datetime.now()
         self.time_string = self.now.strftime("%m%d_%H-%M-%S")
 
-        self.result_dir = RESULT_DIR  + self.time_string + "/"
+        if overwrite_result_dir is not None:
+            self.result_dir = overwrite_result_dir
+        else:
+            self.result_dir = RESULT_DIR  + self.time_string + "/"
+            
         os.makedirs(self.result_dir, exist_ok=True)
 
         # create a new logging file for each instance
