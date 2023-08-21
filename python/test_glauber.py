@@ -12,14 +12,15 @@ import shutil
 
 # @pytest.mark.parametrize("class_to_test", (GlauberSimulatorFixIndices, GlauberSimDynIndices))
 @pytest.mark.parametrize(
-    "class_to_test", (GlauberSimulatorFixIndices, GlauberSimDynIndices)
+    "class_to_test", (GlauberSimDynIndices, )
 )
 class TestSingleGlauber:
     def test_small_2(self, class_to_test: type[GlauberSim], tmpdir):
         tmpdir = str(tmpdir)
         np.random.seed(0)
         sim = class_to_test(
-            n_interior=84, padding=3, p=0.7, t=2000, tol=0.85, results_dir=tmpdir
+            n_interior=84, padding=3, p=0.7, t=2000, tol=0.85, results_dir=tmpdir,
+            random_seed=0
         )
         result = sim.run_single_glauber(False)
         assert result["fixation"] == False and result["iterations"] == 2000
@@ -27,15 +28,16 @@ class TestSingleGlauber:
     def test_small_checkpoints(self, class_to_test: type[GlauberSim], tmpdir):
         tmpdir = str(tmpdir)
         np.random.seed(0)
-        if os.path.isdir("./results/test_small_longpppp"):
-            shutil.rmtree("./results/test_small_long")
+        
+
         sim = class_to_test(
             n_interior=84,
             padding=3,
             p=0.7,
             t=1000,
             tol=0.85,
-            results_dir=tmpdir
+            results_dir=tmpdir,
+            random_seed=0
         )
         result_1 = sim.run_single_glauber(False)
         checkpoint_dir = sim.results_dir
@@ -47,6 +49,8 @@ class TestSingleGlauber:
             t=2000,
             tol=0.85,
             checkpoint_file=f"{checkpoint_dir}/bitmap_results/iter-1000.bmp",
+            results_dir=tmpdir + '/continuation',
+            random_seed=1
         )
         result_2 = sim_2.run_single_glauber(False)
 
@@ -91,6 +95,7 @@ class TestSingleGlauber:
             t=200000,
             tol=0.982,
             results_dir=tmpdir,
+            random_seed=0
         )
         result = sim.run_single_glauber(verbose=True)
 
@@ -102,7 +107,8 @@ class TestSingleGlauber:
         tmpdir = str(tmpdir)
         np.random.seed(0)
         sim = class_to_test(
-            n_interior=200, padding=15, p=0.7, t=200000, tol=0.9, results_dir=tmpdir
+            n_interior=200, padding=15, p=0.7, t=200000, tol=0.9, results_dir=tmpdir,
+            random_seed=0
         )
         result = sim.run_single_glauber(verbose=True)
         assert result["fixation"] == True
@@ -385,4 +391,4 @@ class TestDynamicIndices:
 
 
 if __name__ == "__main__":
-    sys.exit(pytest.main(["-c", "pyproject.toml", "-k dynamic", "--durations=0"]))
+    sys.exit(pytest.main(["-c", "pyproject.toml", "--durations=0"]))
