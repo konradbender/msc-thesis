@@ -54,7 +54,7 @@ class GlauberSimBitArray(GlauberSim, ABC):
         self.matrix.export_to_file(self.bitmap_dir + f"/iter-{iter}.bmp")
 
     def load_checkpoint_matrix(self) -> BitArrayMat:
-        self.logger.info("Loading checkpoint matrix")
+        self.logger.info(f"Loading checkpoint matrix from {self.checkpoint_file}")
         matrix = BitArrayMat(self.n_outer, self.n_outer)
         try:
             matrix.load_from_file(self.checkpoint_file)
