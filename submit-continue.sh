@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job continue old runs
+#SBATCH --job continue_old_runs
 #SBATCH --mem 16G
 #SBATCH --partition=standard-cpu
 #SBATCH --export=ALL
