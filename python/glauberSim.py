@@ -240,7 +240,12 @@ class GlauberSim(ABC):
         for i in itertools.islice(range(0, self.t), last_index + 1, None):
             """Updates the vertex at index in the matrix""" 
 
-            index = self.get_index(i)
+            if len(self.indices) > 0:
+                index = self.get_index(i)
+            else:
+                self.logger.info("No more indices available, breaking")
+                iterations = i
+                break
 
             nb_left = self.matrix[index[0], index[1] - 1]
             nb_right = self.matrix[index[0], index[1] + 1]
@@ -316,7 +321,7 @@ class GlauberSim(ABC):
 
         # end glauber for loop
 
-        if not fixation:
+        if not fixation and len(self.indices) > 0:
             iterations = self.t
 
         # for good measure, always save last bitmap
