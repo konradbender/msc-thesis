@@ -18,11 +18,9 @@ def test_main_1(tmpdir):
     options = f"--t={t} --n={n} --checkpoint={checkpoint} " + \
         f"--n_int={n_int} --padding={padding} --p={p} --force_new"
     
-    try:
-        main  = Main(result_dir=tmpdir)
-        main.main(options.split())
-    except SystemExit:
-        pass
+    
+    main  = Main(result_dir=tmpdir, arguments = options.split())
+    main.main()
 
 def test_main_2(tmpdir):
     tmpdir = str(tmpdir) +  "/"
@@ -39,11 +37,10 @@ def test_main_2(tmpdir):
         f"--n_int={n_int} --padding={padding} --p={p} --tol={tol} --force_new"
     
     
-    try:
-        main  = Main(result_dir=tmpdir)
-        main.main(options.split())
-    except SystemExit:
-        pass
+    
+    main  = Main(result_dir=tmpdir, arguments=options.split())
+    main.main()
+  
 
     result = json.load(open(f"{main.result_dir}/rep-0/result-dict.json", "r"))
     np.testing.assert_array_equal(
@@ -259,7 +256,7 @@ if __name__ == "__main__":
             [
                 "-c",
                 "pyproject.toml",
-                "-k test_main_2 ",
+                "-k main",
                 "--durations=0"
             ]
         )
