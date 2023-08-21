@@ -11,6 +11,7 @@ import socket
 import gitinfo
 
 from glauberFixIndices import GlauberSimulatorFixIndices
+from glauberDynIndices import GlauberSimDynIndices
 
 RESULT_DIR = "./results/"
 
@@ -25,17 +26,26 @@ parser.add_argument("--padding", help="Size of the padding around the lattice")
 parser.add_argument("--force_new", help="Can surpress checkpoint loading",
                     action="store_true")
 parser.add_argument("--tol", help="Tolerance to determine fixation")
+parser.add_argument("--dynamic", help="if true, use dynamic indices", action="store_true")
 
 
-def create_sim_and_submit(*args, **kwargs):
+
+def create_fixed_and_submit(*args, **kwargs):
         sim = GlauberSimulatorFixIndices(*args, **kwargs)
+        result = sim.run_single_glauber(verbose=True)
+        return result
+
+def create_dynamic_and_submit(*args, **kwargs):
+        sim = GlauberSimDynIndices(*args, **kwargs)
         result = sim.run_single_glauber(verbose=True)
         return result
 
 
 class Main:
     
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(self, arguments=None, *args, **kwargs) -> None:
+        
+        self.args = parser.parse_args(arguments)
 
         overwrite_result_dir = kwargs.get("result_dir", None)
 
@@ -129,17 +139,34 @@ class Main:
         with fts.ProcessPoolExecutor(max_workers=mp.cpu_count()) as executor:
 
             for i in range(iterations):
-                future = executor.submit(create_sim_and_submit,
-                                        padding = padding,
-                                        n_interior = n_interior,
-                                        p = p,
-                                        t = t,
-                                        tol = tol,
-                                        results_dir = self.result_dir + 'rep-' + str(i),
-                                        save_bitmaps_every =checkpoint_int,
-                                        random_seed = i,
-                                        checkpoint_file = warmstarts[i]
-                                        )
+                if self.args.dynamic:
+                    future = executor.submit(
+                                            create_dynamic_and_submit,
+                                            padding = padding,
+                                            n_interior = n_interior,
+                                            p = p,
+                                            t = t,
+                                            tol = tol,
+                                            results_dir = self.result_dir + 'rep-' + str(i),
+                                            save_bitmaps_every =checkpoint_int,
+                                            random_seed = i,
+                                            checkpoint_file = warmstarts[i]
+                                            )
+                    self.logger.info("submitted dynamic run")
+                else:
+                    future = executor.submit(
+                                            create_fixed_and_submit,
+                                            padding = padding,
+                                            n_interior = n_interior,
+                                            p = p,
+                                            t = t,
+                                            tol = tol,
+                                            results_dir = self.result_dir + 'rep-' + str(i),
+                                            save_bitmaps_every =checkpoint_int,
+                                            random_seed = i,
+                                            checkpoint_file = warmstarts[i]
+                                            )
+                    self.logger.info("submitted fixed run")
                 
                 futures.append(future)
 
@@ -156,7 +183,7 @@ class Main:
         self.logger.info("starting " + self.time_string)
         self.logger.info("number of cores: " + str(mp.cpu_count()))
 
-        args=parser.parse_args(args)
+        args=self.args
 
         self.logger.info("Started run for multiple traces with args" + str(args))
         
