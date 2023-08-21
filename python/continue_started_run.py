@@ -44,7 +44,7 @@ def continue_run(stem, rep, iter):
         tol=1,
         results_dir=result_dir,
         checkpoint_file=f_old_bitmap,
-        random_seed=0,
+        random_seed=i,
         save_bitmaps_every=checkpoint_freq,
     )
 
