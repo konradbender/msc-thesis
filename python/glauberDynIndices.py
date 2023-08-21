@@ -11,8 +11,6 @@ from glauberSimBitarray import GlauberSimBitArray
 from bitarray import bitarray as ba
 import bitarray
 
-LOGGING_STEP = 1000
-
 
 class GlauberSimDynIndices(GlauberSimBitArray):
 
