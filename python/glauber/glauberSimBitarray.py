@@ -36,7 +36,8 @@ class GlauberSimBitArray(GlauberSim, ABC):
         else:
             self.error(f"Boundary {self.boundary} not recognized, leaving random")
 
-        self.matrix = BitArrayMat(self.n_outer, self.n_outer, self.matrix.flatten().tolist())
+        self.matrix = BitArrayMat(self.n_outer, self.n_outer, self.matrix.flatten().tolist(), 
+                                  wraparound_indices=self.wrap_indices)
 
     def setup_interior_mask(self) -> None:
         # make a bitarray for the mask for the inner lattice
@@ -63,7 +64,8 @@ class GlauberSimBitArray(GlauberSim, ABC):
 
     def load_checkpoint_matrix(self) -> BitArrayMat:
         self.logger.info(f"Loading checkpoint matrix from {self.checkpoint_file}")
-        matrix = BitArrayMat(self.n_outer, self.n_outer)
+        matrix = BitArrayMat(self.n_outer, self.n_outer, 
+                             wraparound_indices=self.wrap_indices)
         try:
             matrix.load_from_file(self.checkpoint_file)
         except FileNotFoundError:
