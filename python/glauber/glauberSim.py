@@ -88,6 +88,7 @@ class GlauberSim(ABC):
         self.padding = padding
 
         self.n_interior = n_interior
+        self.n_outer = n_interior + 2 * self.padding
         self.p = p
         self.t = t
         self.tol = tol
@@ -119,6 +120,8 @@ class GlauberSim(ABC):
         self.matrix = None
         self.indices = None
         self.interior_mask = None
+
+        self.wrap_indices = False
 
     @property        
     def checkpoint_available(self):
@@ -173,7 +176,21 @@ class GlauberSim(ABC):
     def add_dyn_neighbors_to_indices(self, index: tuple) -> None:
         """adds the dynamic (i.e., not fixated) neighbors of the given index to the indices to be updated"""
         raise NotImplementedError()
+    
+    def compute_neighbor_sum(self, index: tuple) -> int:
+        """Computes the sum of the spins of the neighbors of the vertex at index. This method gets overwritten
+        when using a TorusGlauberSim, so it is not abstract"""
+        nb_left = self.matrix[index[0], index[1] - 1]
+        nb_right = self.matrix[index[0], index[1] + 1]
+        nb_up = self.matrix[index[0] - 1, index[1]]
+        nb_down = self.matrix[index[0] + 1, index[1]]              
 
+        nb_sum = (
+            nb_left + nb_right + nb_up + nb_down
+        )
+
+        return nb_sum
+    
     def run_single_glauber(
         self,
         verbose: bool = False,
@@ -238,14 +255,7 @@ class GlauberSim(ABC):
                 iterations = i
                 break
 
-            nb_left = self.matrix[index[0], index[1] - 1]
-            nb_right = self.matrix[index[0], index[1] + 1]
-            nb_up = self.matrix[index[0] - 1, index[1]]
-            nb_down = self.matrix[index[0] + 1, index[1]]              
-
-            nb_sum = (
-                nb_left + nb_right + nb_up + nb_down
-            )
+            nb_sum = self.compute_neighbor_sum(index)
        
             if nb_sum > 2:
                 if DEBUG:
