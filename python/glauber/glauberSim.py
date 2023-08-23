@@ -5,6 +5,7 @@ import datetime
 import json
 import logging
 import random
+import sys 
 
 import itertools
 
@@ -19,6 +20,7 @@ class GlauberSim(ABC):
         p: np.float64,
         t: np.int64,
         tol: np.float64,
+        boundary = 1,
         padding: np.int64 = None,  # for new code
         n_outer: np.int64 = None,  # kept for depreceated compatibility
         save_bitmaps_every=None,
@@ -49,6 +51,8 @@ class GlauberSim(ABC):
             random seed to use for numpy
         checkpoint_file : str
             path to a checkpoint file to start from. If None, starts from random initialization
+        boundary: int or str
+            If int, boundary will be set to that value else pass string "random" to set random boundary
         """
         self.results_dir = results_dir
 
@@ -101,8 +105,7 @@ class GlauberSim(ABC):
         self.tol = tol
         self.save_bitmaps_every = save_bitmaps_every
         self.checkpoint_file = checkpoint_file
-
-        
+        self.boundary = boundary
 
         parameters = {
             "n_interior": self.n_interior,

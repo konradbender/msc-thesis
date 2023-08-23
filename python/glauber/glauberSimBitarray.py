@@ -6,7 +6,7 @@ from bitarray import bitarray as ba
 import numpy as np
 import os
 
-BOUNDARY = 1
+
 DEBUG = False
 
 
@@ -23,10 +23,18 @@ class GlauberSimBitArray(GlauberSim, ABC):
     def setup_matrix(self) -> None:
         self.matrix = np.random.binomial(n=1, p=self.p, size=self.n_outer**2).astype(np.bool_)
         self.matrix = self.matrix.reshape((self.n_outer, self.n_outer))
-        self.matrix[0, :] = BOUNDARY
-        self.matrix[-1, :] = BOUNDARY
-        self.matrix[:, 0] = BOUNDARY
-        self.matrix[:, -1] = BOUNDARY
+        
+
+        if self.boundary == 0 or self.boundary == 1:
+            self.matrix[0, :] = self.boundary
+            self.matrix[-1, :] = self.boundary
+            self.matrix[:, 0] = self.boundary
+            self.matrix[:, -1] = self.boundary
+            self.logger.info(f"Set up boundary as {self.boundary}")
+        elif self.boundary == "random":
+            self.logger.info("Setting up random boundary")
+        else:
+            self.error(f"Boundary {self.boundary} not recognized, leaving random")
 
         self.matrix = BitArrayMat(self.n_outer, self.n_outer, self.matrix.flatten().tolist())
 

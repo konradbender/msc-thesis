@@ -70,6 +70,21 @@ class TestSingleGlauber:
         result = sim.run_single_glauber(False)
         assert result["fixation"] == False and result["iterations"] == 2000
 
+    def test_random_boundary(self, class_to_test: type[GlauberSim], tmpdir):
+        tmpdir = str(tmpdir)
+        sim = class_to_test(
+            n_interior=84,
+            padding=3,
+            p=0.7,
+            t=2000,
+            tol=0.85,
+            random_seed=69,
+            results_dir=tmpdir,
+            boundary="random",
+        )
+        result = sim.run_single_glauber(False)
+        assert result["fixation"] == False and result["iterations"] == 2000
+
     def test_zero_padding(self, class_to_test: type[GlauberSim], tmpdir):
         tmpdir = str(tmpdir)
         sim = class_to_test(
@@ -391,4 +406,5 @@ class TestDynamicIndices:
 
 
 if __name__ == "__main__":
-    sys.exit(pytest.main(["-c", "pyproject.toml", "--durations=0"]))
+    sys.exit(pytest.main(["-c", "pyproject.toml", "--durations=0", 
+                          "-k", "random" ]))

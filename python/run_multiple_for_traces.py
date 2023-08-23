@@ -29,6 +29,7 @@ parser.add_argument("--tol", help="Tolerance to determine fixation")
 parser.add_argument("--dynamic", help="if true, use dynamic indices", action="store_true")
 parser.add_argument("--mixed", help="if true, use first fixed and then dynamci indices", action="store_true")
 parser.add_argument("--fixed_steps", help="if mixed, how many steps to run fixed indices for")
+parser.add_argument("--random_boundary", help="if set, will set boundary to random values", action="store_true")
 
 
 
@@ -146,7 +147,8 @@ class Main:
 
 
 
-    def run_traces(self, n_interior, padding, t, tol, iterations, p, results_dir, checkpoint_int, warmstarts):
+    def run_traces(self, n_interior, padding, t, tol, iterations, p, results_dir, checkpoint_int, warmstarts,
+                   random_boundary=False):
         
         futures = []
         with fts.ProcessPoolExecutor(max_workers=mp.cpu_count()) as executor:
@@ -162,6 +164,9 @@ class Main:
                         "random_seed" : i,
                         "checkpoint_file" : warmstarts[i]
                         }
+                if random_boundary:
+                    run_args["boundary"] = "random"
+                    
                 if self.args.dynamic:
                     future = executor.submit(
                                             create_dynamic_and_submit,
@@ -261,9 +266,13 @@ class Main:
         
         self.run_traces(n_interior=N_INTERIOR, padding=PADDING, t=T, tol=TOL, 
                 iterations=ITERATIONS, p=P, results_dir = self.result_dir, 
-                checkpoint_int=CHECKPOINT_INTERVAL, warmstarts = warmstarts)
+                checkpoint_int=CHECKPOINT_INTERVAL, warmstarts = warmstarts,
+                random_boundary=args.random_boundary)
 
         params.update({"time_string": self.time_string})
+
+        if args.random_boundary:
+            params.update({"boundary": "random"})
 
         with open(self.result_dir + "iterative-params.json", "w") as f:
             json.dump(params, f)

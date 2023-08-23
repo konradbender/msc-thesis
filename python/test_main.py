@@ -40,6 +40,26 @@ def test_main_2(tmpdir):
     main  = Main(result_dir=tmpdir, arguments = options.split())
     main.main()
 
+
+def test_main_random(tmpdir):
+
+    tmpdir = str(tmpdir) + "/"
+
+    t = 2000
+    n = 4
+    checkpoint = 1000
+    n_int = 200
+    padding = 1
+    p = 0.505
+
+    options = f"--t={t} --n={n} --checkpoint={checkpoint} " + \
+        f"--n_int={n_int} --padding={padding} --p={p} --force_new --dynamic --random_boundary"
+    
+    
+    main  = Main(result_dir=tmpdir, arguments = options.split())
+    main.main()
+
+
 def test_main_1(tmpdir):
 
     tmpdir = str(tmpdir) + "/"
@@ -292,7 +312,7 @@ if __name__ == "__main__":
             [
                 "-c",
                 "pyproject.toml",
-                "-k main",
+                "-k main and random",
                 "--durations=0"
             ]
         )
