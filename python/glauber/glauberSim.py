@@ -315,7 +315,7 @@ class GlauberSim(ABC):
 
             if (i % LOGGING_STEP == 0) and verbose:
                 self.logger.info(f"iteration: {i} share of 1 is: {summed_array / target}")
-                self.logger.info(f"Number of vertices available for update: {len(self.indices)}")
+                self.logger.info(f"Length of index list: {len(self.indices)}")
 
             self.add_dyn_neighbors_to_indices(index)
 
