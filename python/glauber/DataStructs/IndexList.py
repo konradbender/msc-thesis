@@ -6,8 +6,9 @@ import numpy as np
 
 class IndexList(object):
     def __init__(self, n_row, n_col):
-        self.included = BitArrayMat(n_row, n_col)
-        self.included.arr.setall(False)
+        raise NotImplementedError()
+        # self.included = BitArrayMat(n_row, n_col)
+        # self.included.arr.setall(False)
 
     def add(self, item):
         self.included[item] = True
