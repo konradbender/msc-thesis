@@ -12,7 +12,7 @@ import shutil
 
 # @pytest.mark.parametrize("class_to_test", (GlauberSimulatorFixIndices, GlauberSimDynIndices))
 @pytest.mark.parametrize(
-    "class_to_test", (GlauberSimDynIndices, )
+    "class_to_test", (GlauberSimDynIndices, GlauberSimulatorFixIndices)
 )
 class TestSingleGlauber:
     def test_small_2(self, class_to_test: type[GlauberSim], tmpdir):

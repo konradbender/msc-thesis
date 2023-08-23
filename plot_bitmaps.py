@@ -40,11 +40,5 @@ def plot_all_bitmaps_in_dir(dir):
 
 
 if __name__ == '__main__':
-    # plot_all_bitmaps_in_dir(dir)
-    plot_all_bitmaps_in_dir("/Users/konrad/code/school/msc-thesis/results/from-remote/0819_20-48-20-continuation/rep-0/bitmap_results")
-    plot_all_bitmaps_in_dir("/Users/konrad/code/school/msc-thesis/results/from-remote/0819_20-48-20-continuation/rep-1/bitmap_results")
-    plot_all_bitmaps_in_dir("/Users/konrad/code/school/msc-thesis/results/from-remote/0819_20-48-20-continuation/rep-2/bitmap_results")
-    plot_all_bitmaps_in_dir("/Users/konrad/code/school/msc-thesis/results/from-remote/0819_20-48-20-continuation/rep-3/bitmap_results")
-    plot_all_bitmaps_in_dir("/Users/konrad/code/school/msc-thesis/results/from-remote/0819_20-48-20-continuation/rep-4/bitmap_results")
-    plot_all_bitmaps_in_dir("/Users/konrad/code/school/msc-thesis/results/from-remote/0819_20-48-20-continuation/rep-5/bitmap_results")
+    plot_all_bitmaps_in_dir("/Users/konrad/code/school/msc-thesis/results/0823_13-29-35/rep-0/bitmap_results")
     
