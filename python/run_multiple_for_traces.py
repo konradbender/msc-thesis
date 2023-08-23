@@ -27,6 +27,8 @@ parser.add_argument("--force_new", help="Can surpress checkpoint loading",
                     action="store_true")
 parser.add_argument("--tol", help="Tolerance to determine fixation")
 parser.add_argument("--dynamic", help="if true, use dynamic indices", action="store_true")
+parser.add_argument("--mixed", help="if true, use first fixed and then dynamci indices", action="store_true")
+parser.add_argument("--fixed_steps", help="if mixed, how many steps to run fixed indices for")
 
 
 
@@ -36,6 +38,17 @@ def create_fixed_and_submit(*args, **kwargs):
         return result
 
 def create_dynamic_and_submit(*args, **kwargs):
+        sim = GlauberSimDynIndices(*args, **kwargs)
+        result = sim.run_single_glauber(verbose=True)
+        return result
+
+def run_fixed_then_dynamic(fixed_steps, *args, **kwargs):
+        fixed_args = kwargs.copy()
+        fixed_args["t"] = fixed_steps
+        sim = GlauberSimulatorFixIndices(*args, **fixed_args)
+        result = sim.run_single_glauber(verbose=True)
+        checkpoint_file = os.path.join(sim.results_dir, "bitmap_results", f"iter-{result['iterations']}.bmp")
+        kwargs["checkpoint_file"] = checkpoint_file
         sim = GlauberSimDynIndices(*args, **kwargs)
         result = sim.run_single_glauber(verbose=True)
         return result
@@ -139,39 +152,44 @@ class Main:
         with fts.ProcessPoolExecutor(max_workers=mp.cpu_count()) as executor:
 
             for i in range(iterations):
+                run_args =  {"padding" : padding,
+                        "n_interior" : n_interior,
+                        "p" : p,
+                        "t" : t,
+                        "tol" : tol,
+                        "results_dir" : self.result_dir + 'rep-' + str(i),
+                        "save_bitmaps_every" :checkpoint_int,
+                        "random_seed" : i,
+                        "checkpoint_file" : warmstarts[i]
+                        }
                 if self.args.dynamic:
                     future = executor.submit(
                                             create_dynamic_and_submit,
-                                            padding = padding,
-                                            n_interior = n_interior,
-                                            p = p,
-                                            t = t,
-                                            tol = tol,
-                                            results_dir = self.result_dir + 'rep-' + str(i),
-                                            save_bitmaps_every =checkpoint_int,
-                                            random_seed = i,
-                                            checkpoint_file = warmstarts[i]
+                                            **run_args
                                             )
                     self.logger.info("submitted dynamic run")
+                elif self.args.mixed:
+                    if self.args.fixed_steps is None:
+                        raise ValueError("if mixed, need to specify fixed_steps")
+                    future = executor.submit(
+                                            run_fixed_then_dynamic,
+                                            int(self.args.fixed_steps),
+                                            **run_args)
                 else:
                     future = executor.submit(
                                             create_fixed_and_submit,
-                                            padding = padding,
-                                            n_interior = n_interior,
-                                            p = p,
-                                            t = t,
-                                            tol = tol,
-                                            results_dir = self.result_dir + 'rep-' + str(i),
-                                            save_bitmaps_every =checkpoint_int,
-                                            random_seed = i,
-                                            checkpoint_file = warmstarts[i]
+                                            **run_args
                                             )
                     self.logger.info("submitted fixed run")
                 
                 futures.append(future)
 
             for future in fts.as_completed(futures):
-                result = future.result()
+                try:
+                    result = future.result()
+                    self.logger.info("finished run")
+                except Exception as e:
+                    self.logger.error(f"Some run caused an error: {e}")
 
     def main(self, args = None):
 
@@ -201,6 +219,7 @@ class Main:
         CHECKPOINT_INTERVAL = int(args.checkpoint)
 
         FORCE_NEW = bool(args.force_new)
+
         
         # tolerance for fixation
         if args.tol is None:
