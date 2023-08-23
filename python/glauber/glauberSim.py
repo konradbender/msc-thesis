@@ -22,7 +22,6 @@ class GlauberSim(ABC):
         tol: np.float64,
         boundary = 1,
         padding: np.int64 = None,  # for new code
-        n_outer: np.int64 = None,  # kept for depreceated compatibility
         save_bitmaps_every=None,
         results_dir=None,
         random_seed=None,
@@ -86,18 +85,7 @@ class GlauberSim(ABC):
         fh.setLevel(logging.INFO)
         self.logger.addHandler(fh)
 
-
-        if padding is None and n_outer is None:
-            raise ValueError("padding or n_outer must be specified")
-
-        if padding is not None:
-            self.padding = padding
-            self.n_outer = n_interior + 2 * padding
-
-        if n_outer is not None:
-            raise DeprecationWarning("n_outer is deprecated, use padding instead")
-            self.n_outer = self.n_outer
-            self.padding = (self.n_outer - n_interior) // 2
+        self.padding = padding
 
         self.n_interior = n_interior
         self.p = p
