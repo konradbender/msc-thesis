@@ -6,8 +6,8 @@
 #SBATCH --mail-type=all
 
 # THE FOLLOWING TWO MUST BE MANUALLY ALIGNED -  ONCE ORE MORE THAN ITERS
-N=4
-#SBATCH --cpus-per-task 5
+N=7
+#SBATCH --cpus-per-task 8
 
 echo “I am job running on the computer ${HOSTNAME}”
 
@@ -26,4 +26,4 @@ P=0.505
 
 # run the script
 python3 python/run_multiple_for_traces.py --t=$T --n=$N --checkpoint=$CHECKPOINT \
- --n_int=$N_INT --padding=$PADDING --p=$P --mixed --fixed_steps=500000 --radnom_boundary
+ --n_int=$N_INT --padding=$PADDING --p=$P --mixed --fixed_steps=500000 --random_boundary
