@@ -17,12 +17,13 @@ which python
 echo $PATH
 
 T=20000000 # time steps
-N_INT=500 # n_interior, so the size of the grid
-CHECKPOINT=1000000 # steps between model checkpoints
+N_INT=250 # n_interior, so the size of the grid
+CHECKPOINT=100000 # steps between model checkpoints
 
 PADDING=10 # padding for the grid
 
 P=0.505
 
 # run the script
-python3 python/run_multiple_for_traces.py --t=$T --n=$N --checkpoint=$CHECKPOINT --n_int=$N_INT --padding=$PADDING --p=$P 
+python3 python/run_multiple_for_traces.py --t=$T --n=$N --checkpoint=$CHECKPOINT \
+ --n_int=$N_INT --padding=$PADDING --p=$P --mixed --fixed_steps=500000 --radnom_boundary
