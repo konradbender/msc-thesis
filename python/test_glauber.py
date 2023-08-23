@@ -1,6 +1,6 @@
-from glauberFixIndices import GlauberSimulatorFixIndices
-from glauberDynIndices import GlauberSimDynIndices
-from glauberSim import GlauberSim
+from glauber.glauberFixIndices import GlauberSimulatorFixIndices
+from glauber.glauberDynIndices import GlauberSimDynIndices
+from glauber.glauberSim import GlauberSim
 import numpy as np
 import logging
 import timeit

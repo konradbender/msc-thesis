@@ -1,7 +1,7 @@
-from glauberSim import GlauberSim
+from glauber.glauberSim import GlauberSim
 import json
 from abc import ABC, abstractmethod
-from DataStructs.BitArrayMat import BitArrayMat
+from .DataStructs.BitArrayMat import BitArrayMat
 from bitarray import bitarray as ba
 import numpy as np
 import os

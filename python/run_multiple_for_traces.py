@@ -10,8 +10,8 @@ import argparse
 import socket
 import gitinfo
 
-from glauberFixIndices import GlauberSimulatorFixIndices
-from glauberDynIndices import GlauberSimDynIndices
+from glauber.glauberFixIndices import GlauberSimulatorFixIndices
+from glauber.glauberDynIndices import GlauberSimDynIndices
 
 RESULT_DIR = "./results/"
 

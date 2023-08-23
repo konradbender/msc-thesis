@@ -3,9 +3,9 @@ import logging
 import json
 import datetime
 import os
-from DataStructs.ListDict import ListDict
-from DataStructs.BitArrayMat import BitArrayMat
-from glauberSimBitarray import GlauberSimBitArray
+from .DataStructs.ListDict import ListDict
+from .DataStructs.BitArrayMat import BitArrayMat
+from .glauberSimBitarray import GlauberSimBitArray
 
 
 from bitarray import bitarray as ba

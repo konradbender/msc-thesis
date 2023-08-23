@@ -10,8 +10,8 @@ import inspect
 from bitarray import bitarray as ba
 import bitarray
 
-from DataStructs.BitArrayMat import BitArrayMat
-from glauberSimBitarray import GlauberSimBitArray
+from .DataStructs.BitArrayMat import BitArrayMat
+from .glauberSimBitarray import GlauberSimBitArray
 
 
 DEBUG = False
