@@ -134,8 +134,8 @@ class Main:
         with open(RESULT_DIR + datetime.datetime.strftime(last_run, format) + "/iterative-params.json") as f:
             last_params = json.load(f)
         for key, value in params_dict.items():
-            if value != last_params[key]:
-                self.logger.info("last run had different parameters")
+            if key != "t" and value != last_params[key]:
+                self.logger.info("last run had different parameters besides number of iterations")
                 return None
         
         self.logger.info("last run had same parameters, returning checkpoint directories")
