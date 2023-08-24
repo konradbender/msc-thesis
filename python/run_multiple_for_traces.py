@@ -114,7 +114,7 @@ class Main:
                 dt = datetime.datetime.strptime(c, format)  
             except ValueError as e:
                 self.logger.info("found non-date directory: " + c)
-                break
+                continue
             files_of_run = os.listdir(RESULT_DIR + c)
             if "iterative-params.json" not in files_of_run:
                 self.logger.info("found directory without iterative-params.json: " + c)
