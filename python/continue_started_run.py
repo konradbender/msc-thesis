@@ -14,8 +14,10 @@ import argparse
 parser=argparse.ArgumentParser()
 
 parser.add_argument("--stem", help="root Dirs of runs to continue")
+parser.add_argument("--checkpoint_freq", help="Frequency of checkpoints")
+parser.add_argument("--extra_steps", help="how many more steps to do")
 
-def continue_run(stem, rep, iter):
+def continue_run(stem, args, rep, iter):
 
     f_old_params = os.path.join(stem, f"rep-{rep}", "simulation-params.json")
     f_old_bitmap = os.path.join(stem, f"rep-{rep}", "bitmap_results", f"iter-{iter}.bmp")
@@ -28,10 +30,10 @@ def continue_run(stem, rep, iter):
     padding = old_params["padding"]
     p = old_params["p"]
     tol = old_params["tol"]
-    checkpoint_freq = 1e5
+    checkpoint_freq = int(args.checkpoint_freq)
 
     old_steps = old_results["iterations"]
-    more_steps_to_do = 10e6
+    more_steps_to_do = int(args.extra_steps)
 
     
     result_dir = str(os.path.join(stem + '-continuation', f"rep-{rep}"))
@@ -94,7 +96,7 @@ if __name__ == "__main__":
     with fts.ProcessPoolExecutor(max_workers=mp.cpu_count()) as ex:
 
         for i in iters:
-            future = ex.submit(continue_run, stem, i, reps)
+            future = ex.submit(continue_run, stem, args, i, reps)
             futures.append(future)
             logger.info(f"submitted {i}")
 
