@@ -33,28 +33,27 @@ parser.add_argument("--random_boundary", help="if set, will set boundary to rand
 parser.add_argument("--torus", help="if set, use a torus and not a square", action="store_true")
 
 
+classes_square = {"fix": GlauberSimulatorFixIndices, "dyn": GlauberSimDynIndices}
+classes_torus = {"fix": GlauberSimulatorFixIndices, "dyn": GlauberSimDynIndices}
 
-def create_fixed_and_submit(*args, **kwargs):
-        sim = GlauberSimulatorFixIndices(*args, **kwargs)
-        result = sim.run_single_glauber(verbose=True)
-        return result
+classes = {"square": classes_square, "torus": classes_torus}
 
-def create_dynamic_and_submit(*args, **kwargs):
-        sim = GlauberSimDynIndices(*args, **kwargs)
-        result = sim.run_single_glauber(verbose=True)
-        return result
+def create_and_submit(structure, indexing, *args, **kwargs):
+    sim = classes[structure][indexing](*args, **kwargs)
+    result = sim.run_single_glauber(verbose=True)
+    return result
 
-def run_fixed_then_dynamic(fixed_steps, *args, **kwargs):
-        fixed_args = kwargs.copy()
-        fixed_args["t"] = fixed_steps
-        sim = GlauberSimulatorFixIndices(*args, **fixed_args)
-        result = sim.run_single_glauber(verbose=True)
-        
-        checkpoint_file = os.path.join(sim.results_dir, "bitmap_results", f"iter-{result['iterations']}.bmp")
-        kwargs["checkpoint_file"] = checkpoint_file
-        sim = GlauberSimDynIndices(*args, **kwargs)
-        result = sim.run_single_glauber(verbose=True)
-        return result
+def create_fixed_and_then_dynamic(structure, fixed_steps, *args, **kwargs):
+    fixed_args = kwargs.copy()
+    fixed_args["t"] = fixed_steps
+    sim1 = classes[structure]["fix"](*args, **kwargs)
+    result1 = sim1.run_single_glauber(verbose=True)
+
+    checkpoint_file = os.path.join(sim1.results_dir, "bitmap_results", f"iter-{result1['iterations']}.bmp")
+    kwargs["checkpoint_file"] = checkpoint_file
+    sim2 = classes[structure]["dyn"](*args, **kwargs)
+    result = sim2.run_single_glauber(verbose=True)
+    return result
 
 
 class Main:
@@ -151,7 +150,19 @@ class Main:
 
     def run_traces(self, n_interior, padding, t, tol, iterations, p, results_dir, checkpoint_int, warmstarts,
                    random_boundary=False):
-        
+
+        if self.args.dynamic:
+            indexing = "dyn"
+        elif self.args.mixed:
+            indexing = "mixed"
+        else:
+            indexing = "fix"
+
+        if self.args.torus:
+            structure = "torus"
+        else:
+            structure = "square"
+
         futures = []
         with fts.ProcessPoolExecutor(max_workers=mp.cpu_count()) as executor:
 
@@ -169,27 +180,15 @@ class Main:
                 if random_boundary:
                     run_args["boundary"] = "random"
                     
-                if self.args.dynamic:
-                    future = executor.submit(
-                                            create_dynamic_and_submit,
-                                            **run_args
-                                            )
-                    self.logger.info("submitted dynamic run")
-                elif self.args.mixed:
-                    if self.args.fixed_steps is None:
-                        raise ValueError("if mixed, need to specify fixed_steps")
-                    future = executor.submit(
-                                            run_fixed_then_dynamic,
-                                            int(self.args.fixed_steps),
-                                            **run_args)
+                if indexing == "mixed":
+                    run_args["fixed_steps"] = int(self.args.fixed_steps)
+                    future = executor.submit(create_fixed_and_then_dynamic, structure, **run_args)
                 else:
-                    future = executor.submit(
-                                            create_fixed_and_submit,
-                                            **run_args
-                                            )
-                    self.logger.info("submitted fixed run")
+                    future = executor.submit(create_and_submit, structure, indexing, **run_args)
                 
                 futures.append(future)
+            
+            return_value = 0
 
             for future in fts.as_completed(futures):
                 try:
@@ -197,6 +196,8 @@ class Main:
                     self.logger.info("finished run")
                 except Exception as e:
                     self.logger.error(f"Some run caused an error: {e}")
+                    return_value = 1
+        return return_value
 
     def main(self, args = None):
 
@@ -278,7 +279,7 @@ class Main:
                     warmstarts.append(os.path.join(dir, last_bitmap))
         
         
-        self.run_traces(n_interior=N_INTERIOR, padding=PADDING, t=T, tol=TOL, 
+        exit_code = self.run_traces(n_interior=N_INTERIOR, padding=PADDING, t=T, tol=TOL, 
                 iterations=ITERATIONS, p=P, results_dir = self.result_dir, 
                 checkpoint_int=CHECKPOINT_INTERVAL, warmstarts = warmstarts,
                 random_boundary=args.random_boundary)
@@ -294,10 +295,13 @@ class Main:
         self.logger.info("finished " + self.time_string + ", took " + str(datetime.datetime.now() - self.now) + " to run")
         self.logger.info(f"saved results in directory {self.result_dir}")
 
+        return exit_code
+
 
 
 if __name__ == "__main__":
     main = Main()
-    main.main()
+    result = main.main()
+    sys.exit(result)
 
     
