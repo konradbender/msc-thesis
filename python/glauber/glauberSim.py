@@ -288,7 +288,7 @@ class GlauberSim(ABC):
                     self.logger.debug(f"flipping coin for vertex at index {index}, result is {z}")
                 
                 self.matrix[index[0], index[1]] = z
-                # do not add vertex to list of those that can flip because its neighbors are still tied
+                # do not remove vertex from the list of those that can flip because its neighbors are still tied
 
             summed_array = self.sum_ones()
 
