@@ -41,10 +41,13 @@ class GlauberSimBitArray(GlauberSim, ABC):
 
     def setup_interior_mask(self) -> None:
         # make a bitarray for the mask for the inner lattice
-        interior_mask = np.zeros((self.n_outer, self.n_outer), dtype=np.bool_)
         
         # set true for n_interior, which is where we want to "sum up" to determine fixation
-        interior_mask[self.padding:-self.padding, self.padding:-self.padding] = True
+        if self.padding > 0:
+            interior_mask = np.zeros((self.n_outer, self.n_outer), dtype=np.bool_)
+            interior_mask[self.padding:-self.padding, self.padding:-self.padding] = True
+        else:
+            interior_mask = np.ones((self.n_outer, self.n_outer), dtype=np.bool_)
 
         # make a bitarray
         self.interior_mask =  ba(interior_mask.flatten().tolist())
