@@ -87,7 +87,7 @@ def test_main_4(tmpdir):
     n = 4
     checkpoint = 1000
     n_int = 200
-    padding = 1
+    padding = 0
     p = 0.505
 
     options = f"--t={t} --n={n} --checkpoint={checkpoint} " + \
@@ -423,7 +423,7 @@ if __name__ == "__main__":
             [
                 "-c",
                 "pyproject.toml",
-                "-k not slow",
+                "-k test_main_4",
                 "--durations=0"
             ]
         )

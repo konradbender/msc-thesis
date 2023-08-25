@@ -12,6 +12,8 @@ import gitinfo
 
 from glauber.glauberFixIndices import GlauberSimulatorFixIndices
 from glauber.glauberDynIndices import GlauberSimDynIndices
+from glauber.glauberTorus import GlauberFixedIndexTorus
+from glauber.glauberTorus import GlauberDynIndexTorus
 
 RESULT_DIR = "./results/"
 
@@ -34,26 +36,9 @@ parser.add_argument("--torus", help="if set, use a torus and not a square", acti
 
 
 classes_square = {"fix": GlauberSimulatorFixIndices, "dyn": GlauberSimDynIndices}
-classes_torus = {"fix": GlauberSimulatorFixIndices, "dyn": GlauberSimDynIndices}
+classes_torus = {"fix": GlauberFixedIndexTorus, "dyn": GlauberDynIndexTorus}
 
 classes = {"square": classes_square, "torus": classes_torus}
-
-def create_and_submit(structure, indexing, *args, **kwargs):
-    sim = classes[structure][indexing](*args, **kwargs)
-    result = sim.run_single_glauber(verbose=True)
-    return result
-
-def create_fixed_and_then_dynamic(structure, fixed_steps, *args, **kwargs):
-    fixed_args = kwargs.copy()
-    fixed_args["t"] = fixed_steps
-    sim1 = classes[structure]["fix"](*args, **kwargs)
-    result1 = sim1.run_single_glauber(verbose=True)
-
-    checkpoint_file = os.path.join(sim1.results_dir, "bitmap_results", f"iter-{result1['iterations']}.bmp")
-    kwargs["checkpoint_file"] = checkpoint_file
-    sim2  = classes[structure]["dyn"](*args, **kwargs)
-    result = sim2.run_single_glauber(verbose=True)
-    return result
 
 
 class Main:
@@ -102,6 +87,29 @@ class Main:
         
         with open(os.path.join(self.result_dir, "run_multiple_for_traces.json"), "w") as f:
             json.dump(self.args.__dict__, f)
+            
+    def create_and_submit(self, structure, indexing, *args, **kwargs):
+        sim = classes[structure][indexing](*args, **kwargs)
+        self.logger.info("created simulator")
+        result = sim.run_single_glauber(verbose=True)
+        self.logger.info("simulator has finished")
+        return result
+
+    def create_fixed_and_then_dynamic(self, structure, fixed_steps, *args, **kwargs):
+        fixed_args = kwargs.copy()
+        fixed_args["t"] = fixed_steps
+        sim1 = classes[structure]["fix"](*args, **fixed_args)
+        self.logger.info("created fixed simulator for first steps")
+        result1 = sim1.run_single_glauber(verbose=True)
+        self.logger.info("first simulator has finished")
+        
+        checkpoint_file = os.path.join(sim1.results_dir, "bitmap_results", f"iter-{result1['iterations']}.bmp")
+        kwargs["checkpoint_file"] = checkpoint_file
+        sim2  = classes[structure]["dyn"](*args, **kwargs)
+        self.logger.info("created second simulator for dynamic steps")
+        result = sim2.run_single_glauber(verbose=True)
+        self.logger.info("second simulator has finished")
+        return result
 
     def find_last_run(self):
         format = "%m%d_%H-%M-%S"
@@ -196,9 +204,11 @@ class Main:
                     
                 if indexing == "mixed":
                     run_args["fixed_steps"] = int(self.args.fixed_steps)
-                    future = executor.submit(create_fixed_and_then_dynamic, structure, **run_args)
+                    future = executor.submit(self.create_fixed_and_then_dynamic, structure, **run_args)
+                    self.logger.info("submitted mixed run")
                 else:
-                    future = executor.submit(create_and_submit, structure, indexing, **run_args)
+                    future = executor.submit(self.create_and_submit, structure, indexing, **run_args)
+                    self.logger.info("submitted fixed run")
                 
                 futures.append(future)
             

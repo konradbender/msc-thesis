@@ -19,6 +19,12 @@ class GlauberFixedIndexTorus(GlauberSimulatorFixIndices):
         # remember that self.t is the number of iterations
         # Hence may not have index zero or the last elements
         self.indices = np.random.randint(0, self.n_outer , size=2 * self.t).reshape((self.t, 2))
+        
+    def setup_indices(self) -> None:
+        # list of indices we want to look at -> all except boundary points
+        # remember that self.t is the number of iterations
+        # Hence may not have index zero or the last elements
+        self.indices = np.random.randint(0, self.n_outer, size=2 * self.t).reshape((self.t, 2))
 
     
 class GlauberDynIndexTorus(GlauberSimDynIndices):
