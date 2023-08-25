@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import os
 import numpy as np
-from python.DataStructs.BitArrayMat import BitArrayMat
+from python.glauber.DataStructs.BitArrayMat import BitArrayMat
 
 
 def plot_trace(dir, data):
@@ -78,7 +78,7 @@ def one_plot_for_all(stem):
     ax.set_title(f"Traces for t={params['t']}," + \
                 f"tol={params['tol']}, m={params['n_interior']}, p={params['p']}")
     
-    plt.legend()
+    plt.legend(loc="upper left")
     
     plt.savefig(f"{stem}/traces-all.png")
 
@@ -88,6 +88,6 @@ def one_plot_for_all(stem):
 
 if __name__ == '__main__':
     # one_plot_per_rep("/Users/konrad/code/school/msc-thesis/results/from-remote/0817_11-52-28")
-    one_plot_for_all("/Users/konrad/code/school/msc-thesis/results/from-remote/0821_12-03-31")
+    one_plot_for_all("/Users/konrad/code/school/msc-thesis/results/from-remote/0823_14-18-16")
 
     

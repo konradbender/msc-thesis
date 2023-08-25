@@ -258,10 +258,22 @@ class Main:
             params["warmstart_from"] = checkpoint_runs
             if len(checkpoint_runs) < ITERATIONS:
                 self.logger.info("checkpoint does not have same number of runs, starting all from the same")
-                warmstarts = [checkpoint_runs[0] + 'bitmap_results/iter-' + str(T) + '.bmp'] * ITERATIONS
+                dir = checkpoint_runs[0] + 'bitmap_results/'
+                bitmaps = os.listdir(dir)
+                bitmaps = [x for x in bitmaps if x.endswith('.bmp')]
+                bitmaps.sort()
+                last_bitmap = bitmaps[-1]
+                warmstarts = [RESULT_DIR + dir + last_bitmap] * ITERATIONS
             elif len(checkpoint_runs) == ITERATIONS:
                 self.logger.info("checkpoint has same number of runs, starting each from its own")
-                warmstarts = [RESULT_DIR + x + '/bitmap_results/iter-' + str(T) + '.bmp' for x in checkpoint_runs]
+                warmstarts = []
+                for run in checkpoint_runs:
+                    dir = os.path.join(RESULT_DIR, run ,'bitmap_results')
+                    bitmaps = os.listdir(dir)
+                    bitmaps = [x for x in bitmaps if x.endswith('.bmp')]
+                    bitmaps.sort()
+                    last_bitmap = bitmaps[-1]
+                    warmstarts.append(os.path.join(dir, last_bitmap))
         
         
         self.run_traces(n_interior=N_INTERIOR, padding=PADDING, t=T, tol=TOL, 

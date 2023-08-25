@@ -78,6 +78,28 @@ def test_main_1(tmpdir):
     main  = Main(result_dir=tmpdir, arguments = options.split())
     main.main()
 
+def test_checkpoint_discovery(tmpdir):
+
+    t = 2000
+    n = 4
+    checkpoint = 1000
+    n_int = 200
+    padding = 1
+    p = 0.505
+
+    options = f"--t={t//2} --n={n} --checkpoint={checkpoint} " + \
+        f"--n_int={n_int} --padding={padding} --p={p} --force_new"
+    
+    main  = Main(arguments = options.split())
+    main.main()
+
+
+    options = f"--t={t} --n={n} --checkpoint={checkpoint} " + \
+        f"--n_int={n_int} --padding={padding} --p={p}"
+    
+    main  = Main(arguments = options.split())
+    main.main()
+
 def test_main_2(tmpdir):
     tmpdir = str(tmpdir) +  "/"
 
@@ -306,13 +328,15 @@ def test_main_2(tmpdir):
             ]
         ),
     )
+
+
 if __name__ == "__main__":
     sys.exit(
         pytest.main(
             [
                 "-c",
                 "pyproject.toml",
-                "-k main and random",
+                "-k test_checkpoint_discovery",
                 "--durations=0"
             ]
         )
