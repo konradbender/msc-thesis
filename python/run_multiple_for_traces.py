@@ -51,7 +51,7 @@ def create_fixed_and_then_dynamic(structure, fixed_steps, *args, **kwargs):
 
     checkpoint_file = os.path.join(sim1.results_dir, "bitmap_results", f"iter-{result1['iterations']}.bmp")
     kwargs["checkpoint_file"] = checkpoint_file
-    sim2 = classes[structure]["dyn"](*args, **kwargs)
+    sim2  = classes[structure]["dyn"](*args, **kwargs)
     result = sim2.run_single_glauber(verbose=True)
     return result
 
@@ -99,6 +99,10 @@ class Main:
 
         if gitinfo.get_git_info() is not None:
             self.logger.info("git info: " + str(gitinfo.get_git_info())) 
+        
+        with open(os.path.join(self.result_dir, "run_multiple_for_traces.json"), "w") as f:
+            json.dump(list(self.args), f)
+
 
 
     def check_for_checkpoints(self, params_dict):

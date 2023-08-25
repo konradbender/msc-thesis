@@ -14,10 +14,11 @@ source /vols/teaching/msc-projects/2022-2023/kobender/msc-thesis/thesis-env-2/bi
 which python
 echo $PATH
 
-STEM_PATH="/vols/teaching/msc-projects/2022-2023/kobender/msc-thesis/results/0819_20-48-20" 
+STEM_PATH="/private/var/folders/29/50th2yxs2kj93wnhfmd4hkrw0000gn/T/pytest-of-konrad/pytest-204/test_cp_beyond_stop0/0825_15-44-28/" 
 
 CHECKPOINT_FREQ=10000
-EXTRA_STEPS=20000000
+EXTRA_STEPS=20000
+
 
 # run the script
-python3 python/continue_started_run.py --stem=$STEM_PATH --checkpoint_freq=$CHECKPOINT_FREQ --extra_steps=$EXTRA_STEPS
+python3 python/continue-main.py -m --stem=$STEM_PATH --checkpoint_freq=$CHECKPOINT_FREQ --extra_steps=$EXTRA_STEPS

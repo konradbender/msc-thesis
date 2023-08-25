@@ -88,6 +88,6 @@ def one_plot_for_all(stem):
 
 if __name__ == '__main__':
     # one_plot_per_rep("/Users/konrad/code/school/msc-thesis/results/from-remote/0817_11-52-28")
-    one_plot_for_all("/Users/konrad/code/school/msc-thesis/results/from-remote/0823_14-18-16")
+    one_plot_for_all("/Users/konrad/code/school/msc-thesis/results/from-remote/0825_11-13-21")
 
     

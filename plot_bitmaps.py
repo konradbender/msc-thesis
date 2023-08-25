@@ -40,10 +40,11 @@ def plot_all_bitmaps_in_dir(dir):
 
 
 if __name__ == '__main__':
-    plot_all_bitmaps_in_dir("/Users/konrad/code/school/msc-thesis/results/from-remote/0823_14-18-16/rep-0/bitmap_results")
-    plot_all_bitmaps_in_dir("/Users/konrad/code/school/msc-thesis/results/from-remote/0823_14-18-16/rep-1/bitmap_results")
-    plot_all_bitmaps_in_dir("/Users/konrad/code/school/msc-thesis/results/from-remote/0823_14-18-16/rep-2/bitmap_results")
-    plot_all_bitmaps_in_dir("/Users/konrad/code/school/msc-thesis/results/from-remote/0823_14-18-16/rep-3/bitmap_results")
-    plot_all_bitmaps_in_dir("/Users/konrad/code/school/msc-thesis/results/from-remote/0823_14-18-16/rep-4/bitmap_results")
-    plot_all_bitmaps_in_dir("/Users/konrad/code/school/msc-thesis/results/from-remote/0823_14-18-16/rep-5/bitmap_results")
-    plot_all_bitmaps_in_dir("/Users/konrad/code/school/msc-thesis/results/from-remote/0823_14-18-16/rep-6/bitmap_results")
+    plot_all_bitmaps_in_dir("/Users/konrad/code/school/msc-thesis/results/from-remote/0825_11-13-21/rep-2/bitmap_results")
+    plot_all_bitmaps_in_dir("/Users/konrad/code/school/msc-thesis/results/from-remote/0825_11-13-21/rep-3/bitmap_results")
+    plot_all_bitmaps_in_dir("/Users/konrad/code/school/msc-thesis/results/from-remote/0825_11-13-21/rep-4/bitmap_results")
+    plot_all_bitmaps_in_dir("/Users/konrad/code/school/msc-thesis/results/from-remote/0825_11-13-21/rep-5/bitmap_results")
+    plot_all_bitmaps_in_dir("/Users/konrad/code/school/msc-thesis/results/from-remote/0825_11-13-21/rep-6/bitmap_results")
+    plot_all_bitmaps_in_dir("/Users/konrad/code/school/msc-thesis/results/from-remote/0825_11-13-21/rep-0/bitmap_results")
+    plot_all_bitmaps_in_dir("/Users/konrad/code/school/msc-thesis/results/from-remote/0825_11-13-21/rep-1/bitmap_results")
+    
