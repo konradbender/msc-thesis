@@ -322,8 +322,13 @@ class GlauberSim(ABC):
 
         # end glauber for loop
 
-        if not fixation and len(self.indices) > 0:
+        if not fixation and len(self.indices) > 0 and last_index <= self.t:
+            # ran through all iterations, but did not reach fixation
             iterations = self.t
+        
+        if last_index > self.t:
+            # loaded checkpoint that was already past the number of iterations
+            iterations = last_index
 
         # for good measure, always save last bitmap
         self.save_bitmap(iterations)
