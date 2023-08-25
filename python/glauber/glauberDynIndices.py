@@ -34,9 +34,9 @@ class GlauberSimDynIndices(GlauberSimBitArray):
                 )
 
                 # if more than half of neighbors are different, can flip
-                if nb_sum == 3 and self.matrix[i, j] == 0:
+                if nb_sum > 2 and self.matrix[i, j] == 0:
                     self.indices.add((i, j))
-                elif nb_sum == 1 and self.matrix[i, j] == 1:
+                elif nb_sum < 2 and self.matrix[i, j] == 1:
                     self.indices.add((i, j))
 
                 # if there is a tie, can also flip.
