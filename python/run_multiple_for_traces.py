@@ -48,6 +48,7 @@ def run_fixed_then_dynamic(fixed_steps, *args, **kwargs):
         fixed_args["t"] = fixed_steps
         sim = GlauberSimulatorFixIndices(*args, **fixed_args)
         result = sim.run_single_glauber(verbose=True)
+        
         checkpoint_file = os.path.join(sim.results_dir, "bitmap_results", f"iter-{result['iterations']}.bmp")
         kwargs["checkpoint_file"] = checkpoint_file
         sim = GlauberSimDynIndices(*args, **kwargs)
