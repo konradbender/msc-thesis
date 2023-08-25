@@ -16,7 +16,7 @@ class GlauberSimDynIndices(GlauberSimBitArray):
 
     def __init__(self, purge_interval = None, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
-        self.logger.info(f"Initializing GlauberSimDynIndices with parameters: {kwargs}." + 
+        self.logger.info(f"Initializing {type(self).__name__} with parameters: {kwargs}." + 
                      f" Running on PID {os.getpid()}")
         self.purge_interval = purge_interval
 

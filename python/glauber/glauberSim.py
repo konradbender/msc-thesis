@@ -5,6 +5,7 @@ import datetime
 import json
 import logging
 import random
+from copy import copy
 import sys 
 
 import itertools
@@ -53,21 +54,14 @@ class GlauberSim(ABC):
         boundary: int or str
             If int, boundary will be set to that value else pass string "random" to set random boundary
         """
-        self.results_dir = results_dir
+        self.results_dir = copy(results_dir)
 
         if self.results_dir is None:
             now = datetime.datetime.now()
             time_string = now.strftime("%m%d_%H-%M-%S")
             self.results_dir = f"./results/{time_string}/"
-            logging.info(f"results_dir not specified, using {self.results_dir}")
-        else:
-            logging.info(f"results_dir specified, using {self.results_dir}")
 
         os.makedirs(self.results_dir, exist_ok=True)
-
-        self.bitmap_dir = f"{self.results_dir}/bitmap_results/"
-            
-        os.makedirs(self.bitmap_dir, exist_ok=True)
 
         # create a new logging file for each instance
         pid = os.getpid()
@@ -84,6 +78,15 @@ class GlauberSim(ABC):
         fh.setFormatter(formatter)
         fh.setLevel(logging.INFO)
         self.logger.addHandler(fh)
+        
+        if results_dir is None:
+            self.logger.info(f"results_dir not specified, using {self.results_dir}")
+        else:
+            self.logger.info(f"results_dir specified, using {self.results_dir}")
+
+        self.bitmap_dir = f"{self.results_dir}/bitmap_results/"
+            
+        os.makedirs(self.bitmap_dir, exist_ok=True)
 
         self.padding = padding
 
@@ -122,6 +125,7 @@ class GlauberSim(ABC):
         self.interior_mask = None
 
         self.wrap_indices = False
+
 
     @property        
     def checkpoint_available(self):

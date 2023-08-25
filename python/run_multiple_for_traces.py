@@ -30,6 +30,7 @@ parser.add_argument("--dynamic", help="if true, use dynamic indices", action="st
 parser.add_argument("--mixed", help="if true, use first fixed and then dynamci indices", action="store_true")
 parser.add_argument("--fixed_steps", help="if mixed, how many steps to run fixed indices for")
 parser.add_argument("--random_boundary", help="if set, will set boundary to random values", action="store_true")
+parser.add_argument("--torus", help="if set, use a torus and not a square", action="store_true")
 
 
 

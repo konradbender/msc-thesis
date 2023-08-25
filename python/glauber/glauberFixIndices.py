@@ -22,7 +22,7 @@ class GlauberSimulatorFixIndices(GlauberSimBitArray):
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
-        self.logger.info(f"Initializing GlauberSimulatorFixIndices with parameters: {kwargs}." + 
+        self.logger.info(f"Initializing {type(self).__name__} with parameters: {kwargs}." + 
                      f" Running on PID {os.getpid()}")
 
     def setup_indices(self) -> None:
