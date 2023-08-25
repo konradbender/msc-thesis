@@ -60,7 +60,7 @@ class Main:
     
     def __init__(self, arguments=None, *args, **kwargs) -> None:
         
-        self.args = parser.parse_args(arguments)
+        self.args = parser.parse_args(arguments )
 
         overwrite_result_dir = kwargs.get("result_dir", None)
 
@@ -101,13 +101,9 @@ class Main:
             self.logger.info("git info: " + str(gitinfo.get_git_info())) 
         
         with open(os.path.join(self.result_dir, "run_multiple_for_traces.json"), "w") as f:
-            json.dump(list(self.args), f)
+            json.dump(self.args.__dict__, f)
 
-
-
-    def check_for_checkpoints(self, params_dict):
-        """If the last run in the results dir had the same parameters, will return that directory name and else None"""
-
+    def find_last_run(self):
         format = "%m%d_%H-%M-%S"
 
         contents = os.listdir(RESULT_DIR)
@@ -132,11 +128,25 @@ class Main:
         
         runs.sort()
         last_run = runs[-1]
-        last_run_str = datetime.datetime.strftime(last_run, format)
-        self.logger.info("last run in directory " + RESULT_DIR + " was " + str(last_run))
+        
+        return last_run
+
+    def check_for_checkpoints(self, params_dict, last_run_str = None):
+        """If the last run in the results dir had the same parameters, will return that directory name and else None"""
+
+        format = "%m%d_%H-%M-%S"
+
+        if last_run_str is None:
+            last_run = self.find_last_run()
+            if last_run is None:
+                return None
+            last_run_str = datetime.datetime.strftime(last_run, format)
+            self.logger.info("last run in directory " + RESULT_DIR + " was " + str(last_run))
+            last_run_str = os.path.join(RESULT_DIR, last_run_str)    
 
         last_params = {}
-        with open(RESULT_DIR + datetime.datetime.strftime(last_run, format) + "/iterative-params.json") as f:
+
+        with open(os.path.join(last_run_str, "iterative-params.json"), "r") as f:
             last_params = json.load(f)
         for key, value in params_dict.items():
             if key != "t" and value != last_params[key]:
@@ -145,8 +155,8 @@ class Main:
         
         self.logger.info("last run had same parameters, returning checkpoint directories")
 
-        reps = os.listdir(RESULT_DIR + last_run_str + "/")
-        reps = [last_run_str + '/' + x for x in reps if x.startswith("rep-")]
+        reps = os.listdir(last_run_str)
+        reps = [os.path.abspath(os.path.join(last_run_str, x)) for x in reps if x.startswith("rep-")]
 
         return reps
 
@@ -203,7 +213,7 @@ class Main:
                     return_value = 1
         return return_value
 
-    def main(self, args = None):
+    def main(self, last_run=None):
 
         # if the script is run from the command line, args will be None, so the parser
         # will just use the supplied command line arguments
@@ -213,34 +223,32 @@ class Main:
         self.logger.info("starting " + self.time_string)
         self.logger.info("number of cores: " + str(mp.cpu_count()))
 
-        args=self.args
-
-        self.logger.info("Started run for multiple traces with args" + str(args))
+        self.logger.info("Started run for multiple traces with args" + str(self.args))
         
         # number of time steps for each glauber dynamics iteration
-        T = int(args.t)
+        T = int(self.args.t)
 
         # number of times we run glauber dynamcis for each probability
-        ITERATIONS = int(args.n)
+        ITERATIONS = int(self.args.n)
 
         # dimension of the lattice B
-        N_INTERIOR = int(args.n_interior)
+        N_INTERIOR = int(self.args.n_interior)
         # dimension of the padding around B
-        PADDING = int(args.padding)
+        PADDING = int(self.args.padding)
 
-        CHECKPOINT_INTERVAL = int(args.checkpoint)
+        CHECKPOINT_INTERVAL = int(self.args.checkpoint)
 
-        FORCE_NEW = bool(args.force_new)
+        FORCE_NEW = bool(self.args.force_new)
 
         
         # tolerance for fixation
-        if args.tol is None:
+        if self.args.tol is None:
             self.logger.info("tolerance was not set, using default 1")
             TOL = 1
         else:
-            TOL = float(args.tol)
+            TOL = float(self.args.tol)
 
-        P = float(args.p)
+        P = float(self.args.p)
 
         params = {
             "n_interior": N_INTERIOR,
@@ -250,10 +258,11 @@ class Main:
             "iterations": ITERATIONS,
             "p": P,
             "iterations": ITERATIONS,
+            "torus": self.args.torus,
         }  
 
         if not FORCE_NEW:
-            checkpoint_runs = self.check_for_checkpoints(params)
+            checkpoint_runs = self.check_for_checkpoints(params, last_run_str=last_run)
         else:
             checkpoint_runs = None
             self.logger.info("Force new was set, so not loading checkpoints.")
@@ -265,32 +274,34 @@ class Main:
             params["warmstart_from"] = checkpoint_runs
             if len(checkpoint_runs) < ITERATIONS:
                 self.logger.info("checkpoint does not have same number of runs, starting all from the same")
-                dir = checkpoint_runs[0] + 'bitmap_results/'
+                dir = os.path.join(checkpoint_runs[0], 'bitmap_results')
                 bitmaps = os.listdir(dir)
                 bitmaps = [x for x in bitmaps if x.endswith('.bmp')]
                 bitmaps.sort()
                 last_bitmap = bitmaps[-1]
-                warmstarts = [RESULT_DIR + dir + last_bitmap] * ITERATIONS
+                warmstarts = [os.path.join(dir, last_bitmap)] * ITERATIONS
+
             elif len(checkpoint_runs) == ITERATIONS:
                 self.logger.info("checkpoint has same number of runs, starting each from its own")
                 warmstarts = []
                 for run in checkpoint_runs:
-                    dir = os.path.join(RESULT_DIR, run ,'bitmap_results')
-                    bitmaps = os.listdir(dir)
-                    bitmaps = [x for x in bitmaps if x.endswith('.bmp')]
+                    dir = os.path.join(run ,'bitmap_results')
+                    files = os.listdir(dir)
+                    bitmaps = [x for x in files if x.endswith('.bmp')]
+                    bitmaps = [(int(x.split('-')[1].split('.')[0]), x) for x in bitmaps]
                     bitmaps.sort()
-                    last_bitmap = bitmaps[-1]
+                    last_bitmap = bitmaps[-1][1]
                     warmstarts.append(os.path.join(dir, last_bitmap))
         
         
         exit_code = self.run_traces(n_interior=N_INTERIOR, padding=PADDING, t=T, tol=TOL, 
                 iterations=ITERATIONS, p=P, results_dir = self.result_dir, 
                 checkpoint_int=CHECKPOINT_INTERVAL, warmstarts = warmstarts,
-                random_boundary=args.random_boundary)
+                random_boundary=self.args.random_boundary)
 
         params.update({"time_string": self.time_string})
 
-        if args.random_boundary:
+        if self.args.random_boundary:
             params.update({"boundary": "random"})
 
         with open(self.result_dir + "iterative-params.json", "w") as f:

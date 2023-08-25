@@ -18,8 +18,8 @@ parser.add_argument("--stem", help="root Dirs of runs to continue")
 parser.add_argument("--checkpoint_freq", help="Frequency of checkpoints")
 parser.add_argument("--extra_steps", help="how many more steps to do")
 
-def main():
-    args=parser.parse_args()
+def main_fn(args = None):
+    args=parser.parse_args(args)
     stem = args.stem
     checkpoint_freq = int(args.checkpoint_freq)
     extra_steps = int(args.extra_steps)
@@ -28,12 +28,19 @@ def main():
         namespace = json.load(f)
     
     namespace["checkpoint"] = checkpoint_freq
-    namespace["t"] = namespace["t"] + extra_steps
+    namespace["t"] = int(namespace["t"]) + extra_steps
 
     args = []
     for key, value in namespace.items():
         if value is not None:
-            args.append(json.dumps(key))
-            args.append(json.dumps(value))
+            if type(value) is bool:
+                if value:
+                    args.append(f"--{key}")
+            else:
+                args.append(f"--{key}={value}")
     
-    main = run_multiple_for_traces.Main()
+    main = run_multiple_for_traces.Main(arguments=args)
+    main.main(last_run=stem)
+
+if __name__ == "__main__":
+    main_fn()
