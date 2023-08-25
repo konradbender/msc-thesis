@@ -77,7 +77,8 @@ class GlauberSim(ABC):
         formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
         fh.setFormatter(formatter)
         fh.setLevel(logging.INFO)
-        self.logger.addHandler(fh)
+        if not len(self.logger.handlers):
+            self.logger.addHandler(fh)
         
         if results_dir is None:
             self.logger.info(f"results_dir not specified, using {self.results_dir}")
