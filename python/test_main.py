@@ -423,7 +423,7 @@ if __name__ == "__main__":
             [
                 "-c",
                 "pyproject.toml",
-                "-k test_main_4",
+                "-k test_cp_beyond_stop",
                 "--durations=0"
             ]
         )
