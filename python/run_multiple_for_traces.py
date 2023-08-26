@@ -195,7 +195,7 @@ class Main:
         with fts.ProcessPoolExecutor(max_workers=mp.cpu_count()) as executor:
 
             for i in range(iterations):
-                rd = rd
+                rd = self.result_dir + 'rep-' + str(i)
                 os.makedirs(rd, exist_ok=True)
                 run_args =  {"padding" : padding,
                         "n_interior" : n_interior,
