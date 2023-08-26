@@ -69,26 +69,27 @@ class GlauberDynIndexTorus(GlauberSimDynIndices):
                         )
         
         for neighbor in neighbors:
-            # do not do the check we do for the dynamic square because here, 
-            # wrapped around neighbors are also dynamic
             
-            x = neighbor[0]
-            y = neighbor[1]
-            nb_sum = (
-                self.matrix[x - 1, y]
-                + self.matrix[x + 1, y]
-                + self.matrix[x , y - 1]
-                + self.matrix[x , y + 1]
-            )
+            # allow neighbors one unit wrapped around to be added
+            if -1 <= neighbor[0] <= self.n_outer  and -1 <= neighbor[1] <= self.n_outer:
+            
+                x = neighbor[0]
+                y = neighbor[1]
+                nb_sum = (
+                    self.matrix[x - 1, y]
+                    + self.matrix[x + 1, y]
+                    + self.matrix[x , y - 1]
+                    + self.matrix[x , y + 1]
+                )
 
-            # if more than half of neighbors are different, can flip
-            if nb_sum > 2 and self.matrix[x, y] == 0:
-                self.indices.add(neighbor)
-            elif nb_sum < 2 and self.matrix[x, y] == 1:
-                self.indices.add(neighbor)
-            # if there is a tie, can also flip.
-            elif nb_sum == 2:
-                self.indices.add(neighbor)  
+                # if more than half of neighbors are different, can flip
+                if nb_sum > 2 and self.matrix[x, y] == 0:
+                    self.indices.add(neighbor)
+                elif nb_sum < 2 and self.matrix[x, y] == 1:
+                    self.indices.add(neighbor)
+                # if there is a tie, can also flip.
+                elif nb_sum == 2:
+                    self.indices.add(neighbor)  
 
 
     
