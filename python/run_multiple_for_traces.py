@@ -195,13 +195,15 @@ class Main:
         with fts.ProcessPoolExecutor(max_workers=mp.cpu_count()) as executor:
 
             for i in range(iterations):
+                rd = rd
+                os.makedirs(rd, exist_ok=True)
                 run_args =  {"padding" : padding,
                         "n_interior" : n_interior,
                         "p" : p,
                         "t" : t,
                         "tol" : tol,
-                        "results_dir" : self.result_dir + 'rep-' + str(i),
-                        "save_bitmaps_every" :checkpoint_int,
+                        "results_dir" : rd,
+                        "save_bitmaps_every" : checkpoint_int,
                         "random_seed" : i,
                         "checkpoint_file" : warmstarts[i],
                         "cp_result_file" : vec_warmstarts[i],
