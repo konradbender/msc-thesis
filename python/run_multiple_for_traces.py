@@ -8,6 +8,7 @@ import os
 import sys
 import argparse
 import socket
+import traceback
 import gitinfo
 
 from glauber.glauberFixIndices import GlauberSimulatorFixIndices
@@ -104,7 +105,9 @@ class Main:
         self.logger.info("first simulator has finished")
         
         checkpoint_file = os.path.join(sim1.results_dir, "bitmap_results", f"iter-{result1['iterations']}.bmp")
+        result_file = os.path.join(sim1.results_dir, "result-dict.json")
         kwargs["checkpoint_file"] = checkpoint_file
+        kwargs["cp_result_file"] = result_file
         sim2  = classes[structure]["dyn"](*args, **kwargs)
         self.logger.info("created second simulator for dynamic steps")
         result = sim2.run_single_glauber(verbose=True)
@@ -157,6 +160,8 @@ class Main:
         with open(os.path.join(last_run_str, "iterative-params.json"), "r") as f:
             last_params = json.load(f)
         for key, value in params_dict.items():
+            if key == "torus" and not "torus" in last_params.keys():
+                continue
             if key != "t" and value != last_params[key]:
                 self.logger.info("last run had different parameters besides number of iterations")
                 return None
@@ -171,6 +176,7 @@ class Main:
 
 
     def run_traces(self, n_interior, padding, t, tol, iterations, p, results_dir, checkpoint_int, warmstarts,
+                   vec_warmstarts,
                    random_boundary=False):
 
         if self.args.dynamic:
@@ -197,7 +203,8 @@ class Main:
                         "results_dir" : self.result_dir + 'rep-' + str(i),
                         "save_bitmaps_every" :checkpoint_int,
                         "random_seed" : i,
-                        "checkpoint_file" : warmstarts[i]
+                        "checkpoint_file" : warmstarts[i],
+                        "cp_result_file" : vec_warmstarts[i],
                         }
                 if random_boundary:
                     run_args["boundary"] = "random"
@@ -220,6 +227,7 @@ class Main:
                     self.logger.info("finished run")
                 except Exception as e:
                     self.logger.error(f"Some run caused an error: {e}")
+                    self.logger.error(traceback.format_exc())
                     return_value = 1
         return return_value
 
@@ -277,36 +285,50 @@ class Main:
             checkpoint_runs = None
             self.logger.info("Force new was set, so not loading checkpoints.")
 
-        warmstarts = [None] * ITERATIONS
+        bm_warmstarts = [None] * ITERATIONS
+        vec_warmstarts = [None] * ITERATIONS
 
         if checkpoint_runs is not None and len(checkpoint_runs) > 0:
             self.logger.info("found checkpoint directories " + str(checkpoint_runs))
             params["warmstart_from"] = checkpoint_runs
             if len(checkpoint_runs) < ITERATIONS:
                 self.logger.info("checkpoint does not have same number of runs, starting all from the same")
+                # first, the bitmaps for warmstart
                 dir = os.path.join(checkpoint_runs[0], 'bitmap_results')
                 bitmaps = os.listdir(dir)
                 bitmaps = [x for x in bitmaps if x.endswith('.bmp')]
                 bitmaps.sort()
                 last_bitmap = bitmaps[-1]
-                warmstarts = [os.path.join(dir, last_bitmap)] * ITERATIONS
+                bm_warmstarts = [os.path.join(dir, last_bitmap)] * ITERATIONS
+                
+                # now the result dict for warmstart
+                file = os.path.join(checkpoint_runs[0], 'result-dict.json')
+                vec_warmstarts = [file] * ITERATIONS
 
             elif len(checkpoint_runs) == ITERATIONS:
                 self.logger.info("checkpoint has same number of runs, starting each from its own")
-                warmstarts = []
+                bm_warmstarts = []
+                vec_warmstarts = []
                 for run in checkpoint_runs:
+                    
+                    # first the bitmaps
                     dir = os.path.join(run ,'bitmap_results')
                     files = os.listdir(dir)
                     bitmaps = [x for x in files if x.endswith('.bmp')]
                     bitmaps = [(int(x.split('-')[1].split('.')[0]), x) for x in bitmaps]
                     bitmaps.sort()
                     last_bitmap = bitmaps[-1][1]
-                    warmstarts.append(os.path.join(dir, last_bitmap))
+                    bm_warmstarts.append(os.path.join(dir, last_bitmap))
+                    
+                    # now the vector
+                    file = os.path.join(run, 'result-dict.json')
+                    vec_warmstarts.append(file)
         
         
         exit_code = self.run_traces(n_interior=N_INTERIOR, padding=PADDING, t=T, tol=TOL, 
                 iterations=ITERATIONS, p=P, results_dir = self.result_dir, 
-                checkpoint_int=CHECKPOINT_INTERVAL, warmstarts = warmstarts,
+                checkpoint_int=CHECKPOINT_INTERVAL, warmstarts = bm_warmstarts,
+                vec_warmstarts=vec_warmstarts,
                 random_boundary=self.args.random_boundary)
 
         params.update({"time_string": self.time_string})

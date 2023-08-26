@@ -26,7 +26,8 @@ class GlauberSim(ABC):
         save_bitmaps_every=None,
         results_dir=None,
         random_seed=None,
-        checkpoint_file=None
+        checkpoint_file=None,
+        cp_result_file=None
     ) -> None:
         """Runs a simulation of the Glauber dynamics on a d-dimensional lattice of size n
         with probability p of initializing a vertex to 1
@@ -51,10 +52,16 @@ class GlauberSim(ABC):
             random seed to use for numpy
         checkpoint_file : str
             path to a checkpoint file to start from. If None, starts from random initialization
+        cp_result_file : str
+            path to the result-dictionary json file of the run to recover from.
         boundary: int or str
             If int, boundary will be set to that value else pass string "random" to set random boundary
         """
         self.results_dir = copy(results_dir)
+        
+        if checkpoint_file is not None:
+            if  cp_result_file is  None:
+                raise ValueError("Cannot specify only one of cp_result_file and checkpoint_file")
 
         if self.results_dir is None:
             now = datetime.datetime.now()
@@ -98,6 +105,7 @@ class GlauberSim(ABC):
         self.tol = tol
         self.save_bitmaps_every = save_bitmaps_every
         self.checkpoint_file = checkpoint_file
+        self.cp_result_file = cp_result_file
         self.boundary = boundary
 
         parameters = {
@@ -143,6 +151,14 @@ class GlauberSim(ABC):
     @abstractmethod
     def load_checkpoint_index(self) -> np.ndarray:
         """ loads the index from the checkpoint file name - note that it must be in the format '*-<index>.<ending>'"""
+        raise NotImplementedError()
+
+    @abstractmethod
+    def load_checkpoint_vector(self, last_index):
+        raise NotImplementedError()
+    
+    @abstractmethod
+    def load_checkpoint_matrix(self):
         raise NotImplementedError()
     
     @abstractmethod    
@@ -237,6 +253,11 @@ class GlauberSim(ABC):
             try:
                 self.matrix = self.load_checkpoint_matrix()
                 last_index = self.load_checkpoint_index()
+                if last_index >= self.t:
+                    logging.info("Checkpoint file is already past the number of iterations, breaking")
+                    self.teardown_sim()
+                    return json.load(open(self.cp_result_file, "r"))
+                vector = self.load_checkpoint_vector(last_index)
             except FileNotFoundError as e:
                 self.logger.error("Checkpoint file not found, starting from scratch")
                 last_index = -1

@@ -76,5 +76,20 @@ class GlauberSimBitArray(GlauberSim, ABC):
             raise FileNotFoundError
         return matrix
     
+    def load_checkpoint_vector(self, last_index):
+        self.logger.info(f"Loading checkpoint vector from {self.cp_result_file}")
+        vector = np.ones(self.t) * np.int64(-1)
+        
+        try:
+            with open(self.cp_result_file, "r") as f:
+                cp_result = json.load(f)
+            cp_vector = np.array(cp_result["vector"])
+        except FileNotFoundError:
+            self.logger.error("Checkpoint file not found")
+            raise FileNotFoundError
+
+        vector[0:last_index] = cp_vector[0:last_index]
+        return vector
+    
     def sum_ones(self) -> int:
         return self.matrix.arr[self.interior_mask].count(1)
