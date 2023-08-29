@@ -6,4 +6,4 @@ Results are in `/thesis-results/`. There are three directories for the three dif
 
 For example, this is one of those animations:
 
-![](thesis-results/0826_19-14-32 (torus)/rep-3/animation.gif)
+![](./thesis-results/0826_19-14-32-torus/rep-3/animation.gif)
