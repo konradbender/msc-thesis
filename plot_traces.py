@@ -1,6 +1,6 @@
 import json
 import matplotlib
-matplotlib.use('Agg')
+plt.ioff()
 import matplotlib.pyplot as plt
 import pandas as pd
 import os
@@ -28,7 +28,7 @@ def plot_trace(dir, data):
 
     plt.plot(np.arange(good_data.shape[0]), good_data)
     ax.set_title(f"Traces for t={t}," + \
-                 f"tol={tol}, n={n_outer}, m={n_inner}, p={p}")
+                 f"tol={tol}, n={n_outer}, m={n_inner}, p={p} ")
     plt.savefig(f"{dir}/trace.png")
 
 def get_data(dir):
@@ -76,7 +76,7 @@ def one_plot_for_all(stem):
         plt.plot(np.arange(good_data.shape[0]), good_data, label=dir)
     
     ax.set_title(f"Traces for t={params['t']}," + \
-                f"tol={params['tol']}, m={params['n_interior']}, p={params['p']}")
+                f"tol={params['tol']}, m={params['n_interior']}, p={params['p']} \n Experiment {os.path.basename(stem)}")
     
     plt.legend(loc="upper left")
     

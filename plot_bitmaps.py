@@ -10,6 +10,12 @@ from python.glauber.DataStructs.BitArrayMat import BitArrayMat
 from concurrent.futures import ProcessPoolExecutor, as_completed
 import os
 
+CMAP = 'bwr'
+
+values = [0,1]
+    
+labels = {0:'-1', 1:'+1'}
+    
 
 def plot_bitmap(dir, iter):
     with (open(f"{dir}/params.json")) as f:
@@ -19,24 +25,55 @@ def plot_bitmap(dir, iter):
     matrix.load_from_file(dir + f"/iter-{iter}.bmp")
     np_mat = matrix.to_numpy()
     
-    values = [0,1]
-    
-    labels = {0:'-1', 1:'1'}
-    
-    im = plt.imshow(np_mat, cmap="bwr", vmin=0, vmax=1)
+    im = plt.matshow(np_mat, cmap="bwr", vmin=0, vmax=1)
     
     # get the colors of the values, according to the 
     # colormap used by imshow
-    colors = [ im.cmap(im.norm(value)) for value in values]
+    colors = [im.cmap(im.norm(value)) for value in values]
     # create a patch (proxy artist) for every color 
     patches = [ mpatches.Patch(color=colors[i], 
-                               label=labels[values[i]])  for i in range(len(values)) ]
+                                label=labels[values[i]])  for i in range(len(values)) ]
 
     plt.legend(handles=patches, loc='lower center',bbox_to_anchor=(0.5, -0.2), ncol=2)
 
-    plt.title(f"Bitmap for iter={iter}")
+    plt.title("Bitmap for iter {:,.0f}".format(iter))
     plt.tight_layout()
     plt.savefig(dir + f"/iter-{iter}.png", dpi=75)
+    
+    
+def plot_three_bitmaps(dir_stem, rep, iters):
+    dir = os.path.join(dir_stem, f"rep-{rep}", "bitmap_results")
+    fig, ax = plt.subplots(1,3, figsize=(11,3.5))
+    fig.tight_layout()
+    for i, iter in enumerate(iters):
+        with (open(f"{dir}/params.json")) as f:
+            params = json.load(f)
+            
+        matrix = BitArrayMat(params['n_outer'], params['n_outer'])
+        try:
+            matrix.load_from_file(dir + f"/iter-{iter}.bmp")
+            np_mat = matrix.to_numpy()
+        except FileNotFoundError:
+            UserWarning(f"This file does not exist: {dir + f'/iter-{iter}.bmp'}")
+            np_mat = np.full((params['n_outer'], params['n_outer']), np.nan)        
+    
+        im = ax[i].matshow(np_mat, cmap="bwr", vmin=0, vmax=1)
+        
+        # get the colors of the values, according to the 
+        # colormap used by imshow
+        colors = [im.cmap(im.norm(value)) for value in values]
+        # create a patch (proxy artist) for every color 
+        patches = [ mpatches.Patch(color=colors[i], 
+                                    label=labels[values[i]])  for i in range(len(values)) ]
+        
+        ax[i].set_title('iter {:,.0f}'.format(iter))
+    
+    fig.suptitle(f"Bitmaps for different iterations of rep-{rep}, Experiment {os.path.basename(dir_stem)}")
+    fig.legend(handles=patches, ncols=2)
+    fig.tight_layout()
+    fig.savefig(os.path.join(os.path.dirname(dir), f"three-bitmaps-rep-{rep}.pdf"))
+
+    
 
 def plot_all_bitmaps_in_dir(dir):
     content = os.listdir(dir)

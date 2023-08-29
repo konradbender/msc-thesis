@@ -22,3 +22,5 @@ EXTRA_STEPS=20000
 
 # run the script
 python3 python/continue-main.py -m --stem=$STEM_PATH --checkpoint_freq=$CHECKPOINT_FREQ --extra_steps=$EXTRA_STEPS
+
+echo "done"
