@@ -1,9 +1,3 @@
 # Glauber Dynamics on Percolated Lattices
 
-This repo holds the code for my Master Thesis on Glauber Dynamics [(Wikipedia)](https://en.wikipedia.org/wiki/Glauber_dynamics)
-
-I have set up three different way to similate it
-
-- Pure Python with NumPy (`/python `)
-- Pre-Compiled Python with Numba(`/python/glauber2D.py`)
-- C++ with a Python Wrapper (`/c++` and `/python/glauberFast.py`)
+This repo holds the code for my Master Thesis on Glauber Dynamics [(Wikipedia)](https://en.wikipedia.org/wiki/Glauber_dynamics). The code for simulation is in `/python` and `/c++`. Plotting files, are in `/plotting`. 

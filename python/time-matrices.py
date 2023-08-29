@@ -1,6 +1,6 @@
 import timeit
 import numpy as np
-from python.glauber.DataStructs.BitArrayMat import BitArrayMat 
+from glauber.DataStructs.BitArrayMat import BitArrayMat 
 
 
 def run_test(ds, indices):
