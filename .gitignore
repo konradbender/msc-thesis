@@ -1,6 +1,4 @@
 .vscode/
-*.png
-*.json
 __pycache__/
 *.dSYM/
 .pytest_cache/
@@ -8,5 +6,15 @@ __pycache__/
 temp/
 *.o
 *.so
-*results/*
-*.bmp
+
+
+results/**
+
+
+thesis-results/**/*.bmp
+thesis-results/**/result-dict.json
+thesis-results/**/simulation-params.json
+thesis-results/**/iterative-params.json
+thesis-results/**/params.json
+thesis-results/**/*.log
+thesis-results/**/bitmap_results/*.png
