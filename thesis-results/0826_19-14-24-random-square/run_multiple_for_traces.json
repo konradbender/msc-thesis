@@ -1,1 +1,0 @@
-{"t": "30000000", "p": "0.505", "n": "10", "checkpoint": "100000", "n_interior": "250", "padding": "10", "force_new": true, "tol": null, "dynamic": false, "mixed": true, "fixed_steps": "500000", "random_boundary": true, "torus": false}
