@@ -80,7 +80,7 @@ def one_plot_for_all(stem):
     ax.set_title(f"Traces for t={params['t']}," + \
                 f"tol={params['tol']}, m={params['n_interior']}, p={params['p']} \n Experiment {os.path.basename(stem)}")
     
-    plt.legend(loc="upper left")
+    plt.legend(loc="bottom right")
     
     plt.savefig(f"{stem}/traces-all.png")
 

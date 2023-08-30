@@ -38,11 +38,12 @@ def plot_bitmap(dir, iter):
     patches = [ mpatches.Patch(color=colors[i], 
                                 label=labels[values[i]])  for i in range(len(values)) ]
 
-    plt.legend(handles=patches, loc='lower center',bbox_to_anchor=(0.5, -0.2), ncol=2)
+    plt.legend(handles=patches, loc='lower center',bbox_to_anchor=(0.5, -0.15), ncol=2)
 
     plt.title("Bitmap for iter {:,.0f}".format(iter))
     plt.tight_layout()
-    plt.savefig(dir + f"/iter-{iter}.png", dpi=75)
+    plt.savefig(dir + f"/iter-{iter}.png", dpi=75, bbox_inches='tight')
+    plt.close()
     
     
 def plot_three_bitmaps(dir_stem, rep, iters):
