@@ -1,7 +1,6 @@
 import json
 import matplotlib
 import matplotlib.pyplot as plt
-plt.ioff()
 import pandas as pd
 from matplotlib import patches as mpatches
 import os

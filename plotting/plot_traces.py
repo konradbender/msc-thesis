@@ -1,6 +1,5 @@
 import json
 import matplotlib
-plt.ioff()
 import matplotlib.pyplot as plt
 import pandas as pd
 import os

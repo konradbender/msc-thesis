@@ -2,6 +2,10 @@ import plot_bitmaps as pm
 import plot_traces
 import make_gif as mg
 import os
+import matplotlib.pyplot as plt
+import matplotlib
+
+matplotlib.use('Agg')   
 
 import warnings
 warnings.simplefilter(action='ignore', category=UserWarning)
@@ -44,6 +48,7 @@ def process_stem(stem):
     
     
 if __name__ == '__main__':
+    plt.ioff()
     process_stem("/Users/konrad/code/school/msc-thesis/results/from-remote")
     
     
