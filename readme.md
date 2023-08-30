@@ -6,4 +6,4 @@ Results are in [`thesis-results/`](./thesis-results/). There are three directori
 
 For example, below is one of those animations. It won't loop on GitHub, so you'll have to re-load the page to see it again.
 
-![](./thesis-results/0826_19-14-32-torus/rep-3/animation.gif)
+![](./thesis-results/0826_19-14-24-random-square/rep-1/animation.gif)
