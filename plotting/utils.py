@@ -19,8 +19,9 @@ def process_run(run_dir):
         if not os.path.isdir(bitmap_path):
             continue
         try:
-            pm.plot_all_bitmaps_in_dir(bitmap_path)
-            mg.make_gif(bitmap_path)
+            # pm.plot_all_bitmaps_in_dir(bitmap_path)
+            # mg.make_gif(bitmap_path)
+            pass
         except Exception as e:
             print(e)
         print(f"For rep {i} done")
