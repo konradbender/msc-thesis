@@ -1,4 +1,4 @@
-from glauber.DataStructs.ListDict import ListDict
+from python.glauber.DataStructs.ListDict import ListDict
 import numpy as np
 import random
 import timeit

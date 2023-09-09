@@ -1,6 +1,10 @@
 import timeit
 import numpy as np
-from glauber.DataStructs.BitArrayMat import BitArrayMat 
+import sys
+import os
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from python.glauber.DataStructs.BitArrayMat import BitArrayMat 
 
 
 def run_test(ds, indices):

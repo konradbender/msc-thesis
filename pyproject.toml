@@ -8,5 +8,8 @@ markers = [
     "serial",
 ]
 addopts = "--durations=0"
+pythonpath = [
+  "python"
+]
 
 

@@ -23,5 +23,5 @@ CHECKPOINT=100000 # steps between model checkpoints
 P=0.505
 
 # run the script
-python3 python/run_multiple_for_traces.py --t=$T --n=$N --checkpoint=$CHECKPOINT \
+python3 python/main.py --t=$T --n=$N --checkpoint=$CHECKPOINT \
  --n_int=$N_INT --padding=0 --p=$P --mixed --fixed_steps=500000 --random_boundary --torus

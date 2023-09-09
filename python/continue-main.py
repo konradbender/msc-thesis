@@ -10,7 +10,7 @@ import socket
 import sys
 import gitinfo  
 import argparse
-import run_multiple_for_traces
+import main
 
 parser=argparse.ArgumentParser()
 
@@ -39,7 +39,7 @@ def main_fn(args = None):
             else:
                 args.append(f"--{key}={value}")
     
-    main = run_multiple_for_traces.Main(arguments=args)
+    main = main.Main(arguments=args)
     main.main(last_run=stem)
 
 if __name__ == "__main__":

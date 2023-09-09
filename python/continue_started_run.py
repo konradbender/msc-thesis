@@ -1,7 +1,6 @@
 from glauber.glauberFixIndices import GlauberSimulatorFixIndices
 from glauber.glauberDynIndices import GlauberSimDynIndices
 import logging
-logging.basicConfig(level=logging.DEBUG)
 import json
 import os
 import concurrent.futures as fts
