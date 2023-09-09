@@ -9,7 +9,7 @@ For example, below is one of those animations, showing the development of repeti
 ![](./thesis-results/0826_19-14-24-random-square/rep-1/animation.gif)
 
 ## Information on the repository
-.
+```
 ├── benchmarking                    # Files to measure the speed of our implementations against NumPy       
 │   ├── time-matrices.py        
 │   └── times-indices.py
@@ -42,3 +42,4 @@ For example, below is one of those animations, showing the development of repeti
 ├── tests                           # Tests for the code - invoke with `$ pytest`
 │   ├── test_glauber.py
 │   └── test_main.py
+```
