@@ -11,10 +11,10 @@ temp/
 results/**
 
 
-thesis_results/**/*.bmp
-thesis_results/**/result-dict.json
-thesis_results/**/simulation-params.json
-thesis_results/**/iterative-params.json
-thesis_results/**/params.json
-thesis_results/**/*.log
-thesis_results/**/bitmap_results/*.png
+thesisResults/**/*.bmp
+thesisResults/**/result-dict.json
+thesisResults/**/simulation-params.json
+thesisResults/**/iterative-params.json
+thesisResults/**/params.json
+thesisResults/**/*.log
+thesisResults/**/bitmap_results/*.png
