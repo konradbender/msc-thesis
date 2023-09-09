@@ -55,9 +55,9 @@ $ pip install -r requirements_pip.txt
 ### 2. Run simulations
 To run simulations, use the script `python/main.py`. It takes the following arguments:
 ```
---t T                       Number of iterations
---p P                       Probability of +1 at initialization
---n N                       Number of repetitions (how many times we run each)
+--t                         Number of iterations
+--p                         Probability of +1 at initialization
+--n                         Number of repetitions (how many times we run each)
 --checkpoint                Number of steps between checkpoint saves
 --n_interior                Size of the interior of the lattice
 --padding                   Size of the padding around the lattice
