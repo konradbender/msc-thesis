@@ -72,13 +72,13 @@ To run simulations, use the script `python/main.py`. It takes the following argu
 
 Here are some example calls:
 
-Simulate $100'000$ steps on a $100\times100$ torus with a random boundary and dynamic indexing. Save checkpoints every $1000$ steps. Run $10$ repetitions, initialize with $p=0.505$ and tolerance $0.95$.
+Simulate $100'000$ steps on a $100\times100$ torus with a random boundary and dynamic indexing. Save checkpoints every $1000$ steps. Run $10$ repetitions, initialize with $p=0.505$ and use tolerance $0.95$.
 
 ```bash
 $ python3 python/main.py --t 100000 --p 0.505 --n 10 --checkpoint 1000 --n_interior 100 --padding 0 --tol 0.95 --dynamic --random_boundary --torus
 ```
 
-Simulate $100'000$ steps on a $100\times100$ square with a fixed boundary, 10 padding on each side, and mixed indexing. Use $10'000$ fixed index steps and then switch to dynamic indexing. Save checkpoints every $1000$ steps. Run $10$ repetitions, initialize with $p=0.505$ and tolerance $0.95$.
+Simulate $100'000$ steps on a $100\times100$ square with a fixed boundary, 10 padding on each side, and mixed indexing. Use $10'000$ fixed index steps and then switch to dynamic indexing. Save checkpoints every $1000$ steps. Run $10$ repetitions, initialize with $p=0.505$ and use tolerance $0.95$.
 
 ```bash
 $ python3 python/main.py --t 100000 --p 0.505 --n 10 --checkpoint 1000 --n_interior 100 --padding 10 --tol 0.95 --mixed --fixed_steps 10000
