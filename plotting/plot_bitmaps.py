@@ -21,7 +21,7 @@ values = [0,1]
 labels = {0:'-1', 1:'+1'}
     
 
-def plot_bitmap(dir, iter):
+def plot_bitmap(dir, iter, save = True):
     with (open(f"{dir}/params.json")) as f:
         params = json.load(f)
         
@@ -40,16 +40,17 @@ def plot_bitmap(dir, iter):
 
     plt.legend(handles=patches, loc='lower center',bbox_to_anchor=(0.5, -0.15), ncol=2)
 
-    plt.title("Bitmap for iter {:,.0f}".format(iter))
+    plt.title("Bitmap for Iter. {:,.0f}".format(iter))
     plt.tight_layout()
-    plt.savefig(dir + f"/iter-{iter}.png", dpi=75, bbox_inches='tight')
-    plt.close()
+    if save:
+        plt.savefig(dir + f"/iter-{iter}.png", dpi=75, bbox_inches='tight')
+        plt.close()
+    return im
     
     
-def plot_three_bitmaps(dir_stem, rep, iters):
+def plot_three_bitmaps(dir_stem, rep, iters, save = True, title = True):
     dir = os.path.join(dir_stem, f"rep-{rep}", "bitmap_results")
     fig, ax = plt.subplots(1,3, figsize=(11,3.5))
-    fig.tight_layout()
     for i, iter in enumerate(iters):
         with (open(f"{dir}/params.json")) as f:
             params = json.load(f)
@@ -71,12 +72,17 @@ def plot_three_bitmaps(dir_stem, rep, iters):
         patches = [ mpatches.Patch(color=colors[i], 
                                     label=labels[values[i]])  for i in range(len(values)) ]
         
-        ax[i].set_title('iter {:,.0f}'.format(iter))
+        ax[i].set_title('Iter. {:,.0f}'.format(iter))
     
-    fig.suptitle(f"Bitmaps for different iterations of rep-{rep}, Experiment {os.path.basename(dir_stem)}")
-    fig.legend(handles=patches, ncols=2)
+    if title:
+        fig.suptitle(f"Bitmaps for different iterations of repetition 'rep-{rep}' of Experiment '{os.path.basename(dir_stem)}'")
+        fig.legend(handles=patches, ncols=2)
+    else:
+        fig.legend(handles=patches, ncols=2, loc='lower center', bbox_to_anchor=(0.5, -0.1))
     fig.tight_layout()
-    fig.savefig(os.path.join(os.path.dirname(dir), f"three-bitmaps-rep-{rep}.pdf"))
+    if save:
+        fig.savefig(os.path.join(os.path.dirname(dir), f"three-bitmaps-rep-{rep}.pdf"))
+    return fig, ax
 
     
 

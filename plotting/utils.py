@@ -19,8 +19,8 @@ def process_run(run_dir):
         if not os.path.isdir(bitmap_path):
             continue
         try:
-            # pm.plot_all_bitmaps_in_dir(bitmap_path)
-            # mg.make_gif(bitmap_path)
+            pm.plot_all_bitmaps_in_dir(bitmap_path)
+            mg.make_gif(bitmap_path)
             pass
         except Exception as e:
             print(e)
@@ -32,13 +32,13 @@ def process_run(run_dir):
         print(e)
      
 
-def process_stem(stem):
+def process_stem(stem, force_new=False):
     results = os.listdir(stem)
     for r in results:
         if r.startswith('.'):
             print(f"Skipping {r}")
             continue
-        if "traces-all.png" in os.listdir(os.path.join(stem, r)):
+        if "traces-all.pdf" in os.listdir(os.path.join(stem, r)) and not force_new:
             print(f"Already done {r}")
             continue
         print(f"Starting with {r}")
@@ -50,6 +50,6 @@ def process_stem(stem):
     
 if __name__ == '__main__':
     plt.ioff()
-    process_stem("/Users/konrad/code/school/msc-thesis/results/from-remote")
+    process_stem("/Users/konrad/code/school/msc-thesis/results/from-remote", force_new=True)
     
     

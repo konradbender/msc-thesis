@@ -71,17 +71,19 @@ def one_plot_for_all(stem):
             if "vector" in data.keys() and "iterations" in data.keys():
                 traces[dir] = np.array(data["vector"])
 
-    fig, ax = plt.subplots()
+    fig = plt.figure(figsize=(6, 4))
     
     for dir, trace in traces.items():
         good_data = trace[trace != -1]
         plt.plot(np.arange(good_data.shape[0]), good_data, label=dir)
     
-    ax.set_title(f"Traces for t={params['t']}," + \
-                f"tol={params['tol']}, m={params['n_interior']}, p={params['p']} \n Experiment {os.path.basename(stem)}")
+    plt.title(f"Traces for T={params['t']:,.0f}, " + \
+                 f"m={params['n_interior']}, p={params['p']} \n Experiment '{os.path.basename(stem)}'")
+    plt.xlabel("Iteration")
+    plt.ylabel("Fraction of vertices in $+1$")
     
     plt.legend(loc="lower right")
     
-    plt.savefig(f"{stem}/traces-all.png")
+    plt.savefig(f"{stem}/traces-all.pdf")
 
             
