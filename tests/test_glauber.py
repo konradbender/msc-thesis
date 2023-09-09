@@ -1197,10 +1197,3 @@ class TestDynTorus:
             ),
         )
 
-
-if __name__ == "__main__":
-    sys.exit(
-        pytest.main(
-            ["-c", "pyproject.toml", "--durations=0", "-k", "test_small_checkpoints"]
-        )
-    )
