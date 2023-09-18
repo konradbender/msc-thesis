@@ -25,5 +25,5 @@ PADDING=10 # padding for the grid
 P=0.505
 
 # run the script
-python3 python/run_multiple_for_traces.py --t=$T --n=$N --checkpoint=$CHECKPOINT \
+python3 python/main.py --t=$T --n=$N --checkpoint=$CHECKPOINT \
  --n_int=$N_INT --padding=$PADDING --p=$P --mixed --fixed_steps=500000 --random_boundary

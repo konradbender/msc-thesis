@@ -1,3 +1,5 @@
+"""You can not run these test from the terminal through python. Need to run pytest directly"""""
+
 from glauber.glauberFixIndices import GlauberSimulatorFixIndices
 from glauber.glauberDynIndices import GlauberSimDynIndices
 from glauber.glauberTorus import GlauberFixedIndexTorus, GlauberDynIndexTorus
@@ -1197,10 +1199,3 @@ class TestDynTorus:
             ),
         )
 
-
-if __name__ == "__main__":
-    sys.exit(
-        pytest.main(
-            ["-c", "pyproject.toml", "--durations=0", "-k", "test_small_checkpoints"]
-        )
-    )

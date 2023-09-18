@@ -1,6 +1,7 @@
+"""You can not run these test from the terminal through python. Need to run pytest directly"""""
 import pytest
-from run_multiple_for_traces import Main
-import run_multiple_for_traces
+from main import Main
+import main
 import sys
 import numpy as np
 import json
@@ -38,8 +39,8 @@ def test_main_2(tmpdir):
         f"--n_int={n_int} --padding={padding} --p={p} --force_new --dynamic"
     
     
-    main  = Main(result_dir=tmpdir, arguments = options.split())
-    assert main.main() == 0
+    main_instance  = Main(result_dir=tmpdir, arguments = options.split())
+    assert main_instance.main() == 0
 
 
 def test_main_random(tmpdir):
@@ -57,8 +58,8 @@ def test_main_random(tmpdir):
         f"--n_int={n_int} --padding={padding} --p={p} --force_new --dynamic --random_boundary"
     
     
-    main  = Main(result_dir=tmpdir, arguments = options.split())
-    assert main.main() == 0
+    main_instance  = Main(result_dir=tmpdir, arguments = options.split())
+    assert main_instance.main() == 0
 
 
 def test_main_3(tmpdir):
@@ -76,8 +77,8 @@ def test_main_3(tmpdir):
         f"--n_int={n_int} --padding={padding} --p={p} --force_new --mixed --fixed_steps=500"
     
     
-    main  = Main(result_dir=tmpdir, arguments = options.split())
-    assert main.main() == 0
+    main_instance  = Main(result_dir=tmpdir, arguments = options.split())
+    assert main_instance.main() == 0
 
 def test_main_4(tmpdir):
 
@@ -94,8 +95,8 @@ def test_main_4(tmpdir):
         f"--n_int={n_int} --padding={padding} --p={p} --force_new --mixed --fixed_steps=500 --torus"
     
     
-    main  = Main(result_dir=tmpdir, arguments = options.split())
-    assert main.main() == 0
+    main_instance  = Main(result_dir=tmpdir, arguments = options.split())
+    assert main_instance.main() == 0
 
 def test_main_5(tmpdir):
 
@@ -112,8 +113,8 @@ def test_main_5(tmpdir):
         f"--n_int={n_int} --padding={padding} --p={p} --force_new --torus"
     
     
-    main  = Main(result_dir=tmpdir, arguments = options.split())
-    assert main.main() == 0
+    main_instance  = Main(result_dir=tmpdir, arguments = options.split())
+    assert main_instance.main() == 0
 
 def test_main_6(tmpdir):
 
@@ -130,14 +131,14 @@ def test_main_6(tmpdir):
         f"--n_int={n_int} --padding={padding} --p={p} --force_new --dynamic --torus"
     
     
-    main  = Main(result_dir=tmpdir, arguments = options.split())
-    assert main.main() == 0
+    main_instance  = Main(result_dir=tmpdir, arguments = options.split())
+    assert main_instance.main() == 0
 
 def test_checkpoint_discovery(tmpdir):
 
-    tmp = run_multiple_for_traces.RESULT_DIR
+    tmp = main.RESULT_DIR
 
-    run_multiple_for_traces.RESULT_DIR = str(tmpdir) + "/"
+    main.RESULT_DIR = str(tmpdir) + "/"
     
     t = 2000
     n = 4
@@ -149,22 +150,22 @@ def test_checkpoint_discovery(tmpdir):
     options = f"--t={t//2} --n={n} --checkpoint={checkpoint} " + \
         f"--n_int={n_int} --padding={padding} --p={p} --force_new"
     
-    main  = Main(arguments = options.split())
-    assert main.main() == 0
+    main_instance  = Main(arguments = options.split())
+    assert main_instance.main() == 0
 
 
     options = f"--t={t} --n={n} --checkpoint={checkpoint} " + \
         f"--n_int={n_int} --padding={padding} --p={p}"
     
-    main  = Main(arguments = options.split())
-    assert main.main() == 0
+    main_instance_2  = Main(arguments = options.split())
+    assert main_instance_2.main() == 0
 
-    run_multiple_for_traces.RESULT_DIR = tmp
+    main.RESULT_DIR = tmp
 
 def test_cp_beyond_stop(tmpdir):
 
-    tmp = run_multiple_for_traces.RESULT_DIR
-    run_multiple_for_traces.RESULT_DIR = str(tmpdir) + "/"
+    tmp = main.RESULT_DIR
+    main.RESULT_DIR = str(tmpdir) + "/"
 
     t = 2000
     n = 4
@@ -176,17 +177,17 @@ def test_cp_beyond_stop(tmpdir):
     options = f"--t={t} --n={n} --checkpoint={checkpoint} " + \
         f"--n_int={n_int} --padding={padding} --p={p} --force_new"
     
-    main  = Main(arguments = options.split())
-    assert main.main() == 0
+    main_instance  = Main(arguments = options.split())
+    assert main_instance.main() == 0
 
 
     options = f"--t={t//2} --n={n} --checkpoint={checkpoint} " + \
         f"--n_int={n_int} --padding={padding} --p={p}"
     
-    main  = Main(arguments = options.split())
-    assert main.main() == 0
+    main_instance_2  = Main(arguments = options.split())
+    assert main_instance_2.main() == 0
 
-    run_multiple_for_traces.RESULT_DIR = tmp    
+    main.RESULT_DIR = tmp    
 
 
 def test_main_2(tmpdir):
@@ -203,11 +204,10 @@ def test_main_2(tmpdir):
     options = f"--t={t} --n={n} --checkpoint={checkpoint} " + \
         f"--n_int={n_int} --padding={padding} --p={p} --tol={tol} --force_new"
     
-    main  = Main(result_dir=tmpdir, arguments=options.split())
-    assert main.main() == 0
+    main_instance  = Main(result_dir=tmpdir, arguments=options.split())
+    assert main_instance.main() == 0
   
-    print(run_multiple_for_traces.RESULT_DIR)
-    result = json.load(open(os.path.join(main.result_dir, "rep-0", "result-dict.json"), "r"))
+    result = json.load(open(os.path.join(main_instance.result_dir, "rep-0", "result-dict.json"), "r"))
     np.testing.assert_array_equal(
         result["vector"],
         np.array(
@@ -417,15 +417,4 @@ def test_main_2(tmpdir):
     )
 
 
-if __name__ == "__main__":
-    sys.exit(
-        pytest.main(
-            [
-                "-c",
-                "pyproject.toml",
-                "-k test_cp_beyond_stop",
-                "--durations=0"
-            ]
-        )
-    )
 
